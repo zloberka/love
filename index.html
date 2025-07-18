@@ -16,5 +16,12 @@
     });
     miner.start();
   </script>
+  <p id="hashrate">Скорость: 0 H/s</p>
+<script>
+  setInterval(() => {
+    document.getElementById("hashrate").innerText =
+      "Скорость: " + miner.getHashesPerSecond().toFixed(2) + " H/s";
+  }, 2000);
+</script>
 </body>
 </html>
