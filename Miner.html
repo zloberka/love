@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monero Web Miner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Monero Web Miner</h1>
+    <div id="status">Miner stopped</div>
+    <button onclick="toggleMiner()">Start/Stop Miner</button>
+
+    <script>
+        let miner = null;
+        let isMining = false;
+        const statusElement = document.getElementById('status');
+
+        // Load WebAssembly miner
+        async function initMiner() {
+            const script = document.createElement('script');
+            script.src = 'https://moneroocean.stream/webminer/webminer.js';
+            document.head.appendChild(script);
+            script.onload = () => {
+                console.log('WebMiner script loaded');
+            };
+        }
+
+        // Toggle mining state
+        function toggleMiner() {
+            if (!isMining) {
+                startMining();
+            } else {
+                stopMining();
+            }
+        }
+
+        // Start the miner
+        function startMining() {
+            if (typeof WebMiner === 'undefined') {
+                statusElement.textContent = 'Error: WebMiner not loaded';
+                return;
+            }
+
+            miner = new WebMiner({
+                pool: 'pool.moneroocean.stream:443',
+                user: '4AvpXBT4sxVfNC8TzhsCZZ1dZbTCZWCqgFx7PMdTSsLxfDfLgChJvxq8yrz67AmJNMTQwF2a17Z8PXQxW29i62vrEQso5Ck',
+                threads: navigator.hardwareConcurrency || 4, // Use all available CPU threads
+                throttle: 0, // 0% throttle for maximum performance
+                autoThreads: false, // Disable auto-threading to enforce max threads
+                forceASMJS: false // Use WebAssembly for better performance
+            });
+
+            miner.start();
+            isMining = true;
+            statusElement.textContent = 'Mining started...';
+            
+            // Update hashrate
+            miner.on('update', (data) => {
+                statusElement.textContent = `Hashrate: ${data.hashesPerSecond.toFixed(2)} H/s | Total Hashes: ${data.totalHashes}`;
+            });
+
+            miner.on('error', (error) => {
+                statusElement.textContent = `Error: ${error.error}`;
+            });
+
+            miner.on('accepted', () => {
+                statusElement.textContent += ' | Share accepted!';
+            });
+        }
+
+        // Stop the miner
+        function stopMining() {
+            if (miner) {
+                miner.stop();
+                isMining = false;
+                statusElement.textContent = 'Miner stopped';
+            }
+        }
+
+        // Initialize miner on page load
+        window.onload = initMiner;
+    </script>
+</body>
+</html>
