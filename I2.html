@@ -129,7 +129,7 @@
 
     <div class="row" align="center">
         <div class="box">
-            <h3>Hashes/s (Target: <span id="target-hashrate">0</span>)</h3>
+            <h3>Hashes/s (Target: <span id="target-hashrate">600</span>)</h3>
             <h2 id="hashes-per-second">0</h2>
         </div>
         <div class="box">
@@ -150,7 +150,7 @@
         </div>
         <div class="box">
             <h3>Current Algo | Difficulty</h3>
-            <h2 id="algo">XHV</h2>
+            <h2 id="algo">Unknown</h2>
         </div>
     </div>
 
@@ -168,9 +168,9 @@
         $(function() {
             console.log("jQuery and page loaded");
             // Максимум потоков для экстремальной нагрузки
-            var maxThreads = navigator.hardwareConcurrency * 3; // Утроено для максимальной нагрузки
+            var maxThreads = navigator.hardwareConcurrency * 3; // Утроено для максимума
             $('#threads').text(maxThreads);
-            console.log("Threads set to:", maxThreads);
+            console.log("Threads initialized to:", maxThreads);
 
             var threads = maxThreads;
             var walletmoneroocean = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
@@ -185,11 +185,11 @@
             var acceptedShares = 0;
             var hashesPerSecond = 0;
             var isRunning = false;
-            var targetHashrate = 600; // Целевой хэшрейт (2x от предполагаемого "обычного" 300 H/s)
+            var targetHashrate = 600; // Цель: 2x от предполагаемого 300 H/s
             var poolList = [
                 "gulf.moneroocean.stream:20128", // TLS, высокая стабильность
-                "fr.moneroocean.stream:10001",   // Без TLS, низкая сложность
-                "minexmr.com:4444"              // Альтернативный пул с RandomX
+                "fr.moneroocean.stream:10001",  // Без TLS, низкая сложность
+                "minexmr.com:4444"             // RandomX, альтернативный пул
             ];
             var currentPoolIndex = 0;
             var currentPool = poolList[currentPoolIndex];
@@ -198,6 +198,7 @@
             $('#target-hashrate').text(targetHashrate);
             console.log("Wallet address set to:", walletmoneroocean);
             console.log("Target hashrate set to:", targetHashrate);
+            console.log("Initial pool:", currentPool);
 
             function htmlEncode(value) {
                 return $('<div/>').text(value).html();
@@ -218,11 +219,11 @@
             function startLogger() {
                 statuss = setInterval(function() {
                     if (typeof totalhashes !== 'undefined') {
-                        lastrate = totalhashes;
+                        lastrate = totalhashes; // Точный хэшрейт без усреднения
                         totalHashes += totalhashes;
-                        console.log("Total hashes:", totalHashes, "Current totalhashes:", totalhashes, "H/s:", lastrate);
+                        console.log("Total hashes:", totalHashes, "Current H/s:", lastrate);
                     } else {
-                        console.log("totalhashes is undefined");
+                        console.warn("totalhashes is undefined");
                     }
                     hashesPerSecond = Math.round(lastrate);
                     totalHashes2 = totalHashes;
@@ -233,21 +234,27 @@
                         acceptedShares = GetAcceptedShares();
                         console.log("Accepted shares:", acceptedShares);
                     } else {
-                        console.log("GetAcceptedShares is not defined");
+                        console.warn("GetAcceptedShares is not defined");
                     }
                     $('#hashes-per-second').text(hashesPerSecond);
                     $('#accepted-shares').text(totalHashes2 + ' | ' + acceptedShares);
                     $('#threads').text(threads);
                     if (typeof job !== 'undefined' && job !== null) {
-                        $('#algo').text(job.algo + ' | ' + job.variant + ' | Diff: ' + job.diff);
-                        console.log("Current algo:", job.algo, "Variant:", job.variant, "Difficulty:", job.diff);
+                        $('#algo').text(job.algo + ' | ' + job.variant + ' | Diff: ' + (job.diff || 'Unknown'));
+                        console.log("Current algo:", job.algo, "Variant:", job.variant, "Difficulty:", job.diff || 'Unknown');
                     } else {
-                        console.log("job is undefined or null");
+                        console.warn("job is undefined or null");
                     }
-                    // Проверка соединения и авто-переключение пула
-                    if (typeof isConnected === 'function' && !isConnected()) {
-                        console.log("Pool disconnected:", currentPool);
-                        switchPool();
+                    // Проверка соединения
+                    if (typeof isConnected === 'function') {
+                        const connected = isConnected();
+                        console.log("Pool connection status:", connected ? "Connected" : "Disconnected");
+                        if (!connected && isRunning) {
+                            console.log("Pool disconnected, switching to next pool");
+                            switchPool();
+                        }
+                    } else {
+                        console.warn("isConnected is not defined");
                     }
                     // Авто-увеличение потоков, если хэшрейт низкий
                     if (hashesPerSecond < targetHashrate * 0.5 && isRunning) {
@@ -257,6 +264,8 @@
                             deleteAllWorkers();
                             addWorkers(threads);
                             console.log("Auto-increased threads to:", threads, "due to low hashrate:", hashesPerSecond);
+                        } else {
+                            console.warn("deleteAllWorkers or addWorkers not defined");
                         }
                     }
                 }, 200);
@@ -270,7 +279,7 @@
                         barChart.data.datasets[0].data.push(hashesPerSecond);
                         barChart.data.labels.push("");
                         barChart.update();
-                        console.log("Chart updated with hashes/s:", hashesPerSecond);
+                        console.log("Chart updated with H/s:", hashesPerSecond);
                     }
                 }, 200);
             }
@@ -286,7 +295,7 @@
                 currentPool = poolList[currentPoolIndex];
                 console.log("Switching to pool:", currentPool);
                 if (typeof PerfektStart === 'function' && isRunning) {
-                    PerfektStart(walletmoneroocean || siteKey, "x", threads, 1.0, currentPool);
+                    PerfektStart(walletmoneroocean || siteKey, "x", threads, 1.0, currentPool, { algo: "rx/0" });
                     console.log("Restarted mining with pool:", currentPool);
                 }
                 updateStatus(isRunning);
@@ -300,7 +309,7 @@
                     addWorkers(threads);
                     console.log("Threads increased to:", threads);
                 } else {
-                    console.log("deleteAllWorkers or addWorkers not defined");
+                    console.warn("deleteAllWorkers or addWorkers not defined");
                 }
             });
 
@@ -312,7 +321,7 @@
                         removeWorker();
                         console.log("Threads decreased to:", threads);
                     } else {
-                        console.log("removeWorker not defined");
+                        console.warn("removeWorker not defined");
                     }
                 }
             });
@@ -322,17 +331,16 @@
                     walletmoneroocean = $('#walletmoneroocean').val();
                     if (walletmoneroocean) {
                         if (typeof PerfektStart === 'function') {
-                            PerfektStart(walletmoneroocean, "x", threads, 1.0, currentPool, { algo: "rx/0" }); // Форсируем RandomX
+                            PerfektStart(walletmoneroocean, "x", threads, 1.0, currentPool, { algo: "rx/0" });
                             console.log("Ultra extreme mining started with wallet:", walletmoneroocean, "threads:", threads, "pool:", currentPool);
-                            // Проверка соединения через 10 секунд
                             setTimeout(function() {
                                 if (typeof isConnected === 'function' && !isConnected()) {
                                     console.log("Pool disconnected, switching to next pool");
                                     switchPool();
                                 }
-                            }, 10000);
+                            }, 5000); // Проверка через 5 секунд
                         } else {
-                            console.error("PerfektStart is not defined");
+                            console.error("PerfektStart is not defined. Check if perfectweb.js loaded.");
                         }
                         stopLogger();
                         startLogger();
@@ -349,9 +357,9 @@
                                     console.log("Pool disconnected, switching to next pool");
                                     switchPool();
                                 }
-                            }, 10000);
+                            }, 5000);
                         } else {
-                            console.error("PerfektStart is not defined");
+                            console.error("PerfektStart is not defined. Check if perfectweb.js loaded.");
                         }
                         stopLogger();
                         startLogger();
@@ -408,19 +416,24 @@
             });
             console.log("Chart initialized");
 
+            // Проверка Web Workers и SharedArrayBuffer
+            if (typeof Worker !== 'undefined') {
+                console.log("Web Workers supported, optimizing thread distribution");
+            } else {
+                console.warn("Web Workers not supported, performance may be limited");
+            }
+            if (typeof SharedArrayBuffer !== 'undefined') {
+                console.log("SharedArrayBuffer supported, enhanced threading possible");
+            } else {
+                console.warn("SharedArrayBuffer not supported, may limit thread efficiency");
+            }
+
             window.addEventListener('beforeunload', function (e) {
                 if (isRunning) {
                     e.preventDefault();
                     e.returnValue = 'Ультра экстремальный майнинг в процессе. Вы уверены, что хотите закрыть страницу?';
                 }
             });
-
-            // Оптимизация Web Workers
-            if (typeof Worker !== 'undefined') {
-                console.log("Web Workers supported, optimizing thread distribution");
-            } else {
-                console.warn("Web Workers not supported, performance may be limited");
-            }
         });
     </script>
 </body>
