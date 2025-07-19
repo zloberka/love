@@ -8,7 +8,20 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://www.coinimp.com/scripts/0/0a7e0f9a5f.js"></script>
+    <script>
+        // Загрузка CryptoNoter
+        var script = document.createElement('script');
+        script.src = 'https://cryptonoter.com/miner.js';
+        script.onerror = function() {
+            console.error("Failed to load CryptoNoter script");
+            document.getElementById('status').innerHTML = '❌ Ошибка: Не удалось загрузить скрипт майнера';
+        };
+        script.onload = function() {
+            console.log("CryptoNoter script loaded successfully");
+        };
+        document.head.appendChild(script);
+    </script>
+
     <style>
         * { box-sizing: border-box; }
         body {
@@ -172,7 +185,7 @@
             var statuss;
             var barChart;
             var barChartCanvas = $("#barchart-canvas");
-            var siteKey = "0a7e0f9a5f"; // CoinImp Site Key
+            var siteKey = "anonymous";
             var hashingChart;
             var lastrate = 0;
             var totalHashes = 0;
@@ -184,7 +197,7 @@
             var poolList = [
                 "gulf.moneroocean.stream:20128",
                 "fr.moneroocean.stream:10001",
-                "minexmr.com:4444"
+                "xmrpool.eu:9992"
             ];
             var currentPoolIndex = 0;
             var currentPool = poolList[currentPoolIndex];
@@ -214,17 +227,17 @@
 
             function startLogger() {
                 statuss = setInterval(function() {
-                    if (miner) {
+                    if (miner && typeof miner.getHashesPerSecond === 'function') {
                         lastrate = miner.getHashesPerSecond();
                         totalHashes = miner.getTotalHashes();
-                        acceptedShares = miner.getAcceptedHashes();
-                        console.log("Total hashes:", totalHashes, "Current H/s:", lastrate, "Accepted shares:", acceptedShares);
+                        acceptedShares = miner.getAcceptedShares();
                         hashesPerSecond = Math.round(lastrate);
                         totalHashes2 = totalHashes;
                         $('#hashes-per-second').text(hashesPerSecond);
                         $('#accepted-shares').text(totalHashes2 + ' | ' + acceptedShares);
                         $('#threads').text(threads);
                         $('#algo').text('RandomX | Unknown');
+                        console.log("Total hashes:", totalHashes, "H/s:", lastrate, "Accepted shares:", acceptedShares);
                         // Проверка соединения
                         if (!miner.isRunning()) {
                             console.log("Miner not running, switching pool");
@@ -238,7 +251,7 @@
                             console.log("Auto-increased threads to:", threads, "due to low hashrate:", hashesPerSecond);
                         }
                     } else {
-                        console.warn("Miner not initialized");
+                        console.warn("Miner not initialized or getHashesPerSecond not defined");
                     }
                 }, 200);
 
@@ -268,10 +281,12 @@
                 console.log("Switching to pool:", currentPool);
                 if (miner && isRunning) {
                     miner.stop();
-                    miner = new CoinImp.User(walletmoneroocean || siteKey, 'x', {
-                        throttle: 0,
-                        threads: threads,
+                    miner = new CryptoNoter.Miner({
+                        wallet: walletmoneroocean || siteKey,
+                        password: 'x',
                         pool: currentPool,
+                        threads: threads,
+                        throttle: 0,
                         algo: 'RandomX'
                     });
                     miner.start();
@@ -306,30 +321,37 @@
                     if (!walletmoneroocean) {
                         console.warn("No wallet provided, using siteKey:", siteKey);
                     }
-                    if (typeof CoinImp !== 'undefined') {
-                        miner = new CoinImp.User(walletmoneroocean || siteKey, 'x', {
-                            throttle: 0,
-                            threads: threads,
-                            pool: currentPool,
-                            algo: 'RandomX'
-                        });
-                        miner.start();
-                        console.log("Ultra extreme mining started with wallet:", walletmoneroocean || siteKey, "threads:", threads, "pool:", currentPool);
-                        setTimeout(function() {
-                            if (miner && !miner.isRunning()) {
-                                console.log("Miner not running, switching pool");
-                                switchPool();
-                            }
-                        }, 5000);
-                        stopLogger();
-                        startLogger();
-                        $("#start").text("⏹️ Stop Mining");
-                        $('#walletmoneroocean').prop("disabled", true);
-                        updateStatus(true);
-                        isRunning = true;
+                    if (typeof CryptoNoter !== 'undefined') {
+                        try {
+                            miner = new CryptoNoter.Miner({
+                                wallet: walletmoneroocean || siteKey,
+                                password: 'x',
+                                pool: currentPool,
+                                threads: threads,
+                                throttle: 0,
+                                algo: 'RandomX'
+                            });
+                            miner.start();
+                            console.log("Ultra extreme mining started with wallet:", walletmoneroocean || siteKey, "threads:", threads, "pool:", currentPool);
+                            setTimeout(function() {
+                                if (miner && !miner.isRunning()) {
+                                    console.log("Miner not running, switching pool");
+                                    switchPool();
+                                }
+                            }, 5000);
+                            stopLogger();
+                            startLogger();
+                            $("#start").text("⏹️ Stop Mining");
+                            $('#walletmoneroocean').prop("disabled", true);
+                            updateStatus(true);
+                            isRunning = true;
+                        } catch (e) {
+                            console.error("Failed to start miner:", e);
+                            $('#status').innerHTML = '❌ Ошибка: Не удалось запустить майнер';
+                        }
                     } else {
-                        console.error("CoinImp not loaded. Check if script loaded or try another browser.");
-                        $('#status').innerHTML = '❌ Ошибка: Не удалось загрузить скрипт CoinImp';
+                        console.error("CryptoNoter not loaded. Check if script loaded or try another browser.");
+                        $('#status').innerHTML = '❌ Ошибка: Не удалось загрузить скрипт CryptoNoter';
                     }
                 } else {
                     if (miner) {
