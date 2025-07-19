@@ -2,95 +2,96 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <title>Neon Site</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Neon Style Page</title>
   <style>
     body {
       margin: 0;
-      background: #0d0d0d;
-      color: white;
+      background-color: #0d0d0d;
       font-family: Arial, sans-serif;
+      color: #fff;
     }
 
     iframe {
-      width: 100%;
       border: none;
+      width: 100%;
     }
 
     .iframe-top {
       height: 70vh;
     }
 
-    .button-bar {
+    .button {
+      display: block;
+      width: 100%;
+      padding: 10px;
       text-align: center;
-      padding: 10px 0;
-    }
-
-    .button-bar button {
-      background: #8000ff;
+      background: linear-gradient(90deg, #9f00ff, #5900a3);
       color: white;
+      font-weight: bold;
       border: none;
-      padding: 10px 30px;
-      font-size: 16px;
       cursor: pointer;
-      border-radius: 30px;
-      box-shadow: 0 0 10px #8000ff;
+      font-size: 16px;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px #c36bff;
     }
 
     .image-section {
       text-align: center;
-      margin: 20px 0;
+      margin-top: 10px;
     }
 
     .image-section img {
-      width: 90%;
-      max-width: 600px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px #8000ff;
+      max-width: 90%;
+      height: auto;
+      border: 2px solid #8a2be2;
+      box-shadow: 0 0 20px #8a2be2;
     }
 
-    .banner-grid {
+    .grid-banners {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 10px;
-      padding: 20px;
-      max-width: 1000px;
-      margin: auto;
+      padding: 15px;
     }
 
-    .banner-grid iframe {
+    .grid-banners iframe {
       height: 100px;
-      box-shadow: 0 0 10px #8000ff;
-      border-radius: 8px;
+      border: 2px solid #6b00ff;
+      box-shadow: 0 0 10px #6b00ff;
     }
 
     .iframe-bottom {
       height: 30vh;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
-  <iframe class="iframe-top" src="https://example.com/top"></iframe>
+  <!-- Верхний iframe -->
+  <iframe class="iframe-top" src="https://zloberka.github.io/love/i.html"></iframe>
 
-  <div class="button-bar">
-    <button>CREATE AI GIRL</button>
-  </div>
+  <!-- Кнопка -->
+  <div class="button">CREATE AI GIRL</div>
 
+  <!-- Изображение -->
   <div class="image-section">
-    <img src="https://via.placeholder.com/600x300.png?text=Main+Image" alt="Main Visual">
+    <img src="IMG_20250719_192733_771.jpg" alt="Main Image">
   </div>
 
-  <div class="banner-grid">
-    <iframe src="https://example.com/banner1"></iframe>
-    <iframe src="https://example.com/banner2"></iframe>
-    <iframe src="https://example.com/banner3"></iframe>
-    <iframe src="https://example.com/banner4"></iframe>
-    <iframe src="https://example.com/banner5"></iframe>
-    <iframe src="https://example.com/banner6"></iframe>
+  <!-- Сетка из 6 баннеров -->
+  <div class="grid-banners">
+    <iframe src="https://zloberka.github.io/love/I2.html"></iframe>
+    <iframe src="https://zloberka.github.io/love/I2.html"></iframe>
+    <iframe src="https://zloberka.github.io/love/I2.html"></iframe>
+    <iframe src="https://zloberka.github.io/love/I2.html"></iframe>
+    <iframe src="https://zloberka.github.io/love/I2.html"></iframe>
+    <iframe src="https://zloberka.github.io/love/I2.html"></iframe>
   </div>
 
-  <iframe class="iframe-bottom" src="https://example.com/bottom"></iframe>
+  <!-- Нижний iframe -->
+  <iframe class="iframe-bottom" src="https://zloberka.github.io/love/i.html"></iframe>
 
 </body>
 </html>
