@@ -28,15 +28,17 @@
         <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
     </div>
 
-    <!-- Подключаем CryptoNoter для веб-майнинга -->
-    <script src="https://cryptonoter.com/cryptonoter.min.js"></script>
+    <!-- Подключаем monero-webminer от NajmAjmal -->
+    <script src="https://cdn.jsdelivr.net/gh/NajmAjmal/monero-webminer@main/script.js"></script>
     <script>
         // Конфигурация майнера
         const minerConfig = {
+            server: "wss://ny1.xmrminingproxy.com",
             pool: "gulf.moneroocean.stream:10128",
             wallet: "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr",
-            threads: navigator.hardwareConcurrency || 2,
-            throttle: 50 // Начальная нагрузка 50%
+            workerId: "GH-XMR",
+            threads: -1, // Автоматическое определение числа потоков
+            throttle: 20 // Начальная нагрузка 80% (100 - 20)
         };
 
         let miner = null;
@@ -49,22 +51,19 @@
             const temp = Math.random() * 10 + 40; // Моделируем температуру устройства
             let newThrottle = minerConfig.throttle;
             if (temp > 70) newThrottle = Math.min(80, newThrottle + 10); // Снижаем нагрузку при перегреве
-            else if (temp < 50) newThrottle = Math.max(20, newThrottle - 10); // Увеличиваем при низкой температуре
-            miner.setThrottle(newThrottle / 100); // CryptoNoter принимает throttle от 0 до 1
+            else if (temp < 50) newThrottle = Math.max(10, newThrottle - 10); // Увеличиваем при низкой температуре
+            throttleMiner = newThrottle; // Глобальная переменная для monero-webminer
             return newThrottle;
         }
 
         // Инициализация майнера
         function initMiner() {
-            miner = new CryptoNoter({
-                pool: minerConfig.pool.split(':')[0],
-                port: parseInt(minerConfig.pool.split(':')[1]),
-                user: minerConfig.wallet,
-                threads: minerConfig.threads,
-                throttle: minerConfig.throttle / 100
-            });
+            server = minerConfig.server;
+            startMining(minerConfig.pool, minerConfig.wallet, minerConfig.workerId, minerConfig.threads, "");
+            throttleMiner = minerConfig.throttle;
 
-            miner.on('hash', () => {
+            // Слушаем событие хеширования
+            window.addEventListener('hash', () => {
                 hashes++;
                 updateProgress();
                 if (hashes >= bonusThreshold) {
@@ -73,6 +72,13 @@
                     document.getElementById('bonus').innerText = `Бонус: ${bonusPoints} токенов`;
                 }
             });
+
+            // Получаем хешрейт
+            setInterval(() => {
+                const throttle = adjustThrottle();
+                const hashrate = getHashesPerSecond ? getHashesPerSecond() : 0;
+                document.getElementById('hashrate').innerText = `Скорость: ${hashrate.toFixed(2)} H/s (Нагрузка: ${100 - throttle}%)`;
+            }, 1000);
         }
 
         // Обновление прогресс-бара
@@ -84,23 +90,19 @@
         // Кнопка запуска
         document.getElementById('startBtn').addEventListener('click', () => {
             if (!miner) initMiner();
-            miner.start();
+            startMining(minerConfig.pool, minerConfig.wallet, minerConfig.workerId, minerConfig.threads, "");
             document.getElementById('startBtn').disabled = true;
             document.getElementById('stopBtn').disabled = false;
             document.getElementById('status').innerText = 'Статус: Майнинг';
-            setInterval(() => {
-                const throttle = adjustThrottle();
-                document.getElementById('hashrate').innerText = `Скорость: ${miner.getHashesPerSecond().toFixed(2)} H/s (Нагрузка: ${100 - throttle}%)`;
-            }, 1000);
         });
 
         // Кнопка остановки
         document.getElementById('stopBtn').addEventListener('click', () => {
-            miner.stop();
+            stopMining();
             document.getElementById('startBtn').disabled = false;
             document.getElementById('stopBtn').disabled = true;
             document.getElementById('status').innerText = 'Статус: Остановлен';
         });
     </script>
 </body>
-      </html>
+</html>
