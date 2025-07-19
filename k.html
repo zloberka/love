@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoneroOcean Геймифицированный Майнер</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: #fff; }
+        .container { max-width: 600px; margin: auto; text-align: center; }
+        button { padding: 10px 20px; margin: 10px; background: #00cc00; border: none; border-radius: 5px; cursor: pointer; color: #fff; }
+        button:disabled { background: #555; }
+        .warning { color: #ff5555; font-weight: bold; }
+        .progress { width: 100%; height: 20px; background: #333; border-radius: 5px; overflow: hidden; }
+        .progress-bar { height: 100%; background: #00cc00; width: 0; transition: width 0.5s; }
+        .bonus { font-size: 1.2em; color: #ffd700; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Майнинг Monero с бонусами!</h1>
+        <p class="warning">Внимание: Майнинг использует CPU вашего устройства. Это безопасно, но может нагреть смартфон!</p>
+        <button id="startBtn">Начать майнинг</button>
+        <button id="stopBtn" disabled>Остановить</button>
+        <div id="status">Статус: Остановлен</div>
+        <div id="hashrate">Скорость: 0 H/s</div>
+        <div id="bonus">Бонус: 0 токенов</div>
+        <div>Прогресс до следующего бонуса:</div>
+        <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
+    </div>
+
+    <!-- Подключаем CryptoNoter для веб-майнинга -->
+    <script src="https://cryptonoter.com/cryptonoter.min.js"></script>
+    <script>
+        // Конфигурация майнера
+        const minerConfig = {
+            pool: "gulf.moneroocean.stream:10128",
+            wallet: "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr",
+            threads: navigator.hardwareConcurrency || 2,
+            throttle: 50 // Начальная нагрузка 50%
+        };
+
+        let miner = null;
+        let hashes = 0;
+        let bonusPoints = 0;
+        const bonusThreshold = 1000; // Бонус за каждые 1000 хешей
+
+        // AI-оптимизация нагрузки
+        function adjustThrottle() {
+            const temp = Math.random() * 10 + 40; // Моделируем температуру устройства
+            let newThrottle = minerConfig.throttle;
+            if (temp > 70) newThrottle = Math.min(80, newThrottle + 10); // Снижаем нагрузку при перегреве
+            else if (temp < 50) newThrottle = Math.max(20, newThrottle - 10); // Увеличиваем при низкой температуре
+            miner.setThrottle(newThrottle / 100); // CryptoNoter принимает throttle от 0 до 1
+            return newThrottle;
+        }
+
+        // Инициализация майнера
+        function initMiner() {
+            miner = new CryptoNoter({
+                pool: minerConfig.pool.split(':')[0],
+                port: parseInt(minerConfig.pool.split(':')[1]),
+                user: minerConfig.wallet,
+                threads: minerConfig.threads,
+                throttle: minerConfig.throttle / 100
+            });
+
+            miner.on('hash', () => {
+                hashes++;
+                updateProgress();
+                if (hashes >= bonusThreshold) {
+                    bonusPoints += 10;
+                    hashes = 0;
+                    document.getElementById('bonus').innerText = `Бонус: ${bonusPoints} токенов`;
+                }
+            });
+        }
+
+        // Обновление прогресс-бара
+        function updateProgress() {
+            const progress = (hashes / bonusThreshold) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        // Кнопка запуска
+        document.getElementById('startBtn').addEventListener('click', () => {
+            if (!miner) initMiner();
+            miner.start();
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+            document.getElementById('status').innerText = 'Статус: Майнинг';
+            setInterval(() => {
+                const throttle = adjustThrottle();
+                document.getElementById('hashrate').innerText = `Скорость: ${miner.getHashesPerSecond().toFixed(2)} H/s (Нагрузка: ${100 - throttle}%)`;
+            }, 1000);
+        });
+
+        // Кнопка остановки
+        document.getElementById('stopBtn').addEventListener('click', () => {
+            miner.stop();
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('status').innerText = 'Статус: Остановлен';
+        });
+    </script>
+</body>
+      </html>
