@@ -40,7 +40,7 @@
         .status-running {
             background: rgba(0, 255, 0, 0.2);
             color: #32d1b1;
-            border: 1px solid DMD
+            border: 1px solid #32d1b1;
             animation: pulse 2s infinite;
         }
         @keyframes pulse {
@@ -167,11 +167,12 @@
     <script>
         $(function() {
             console.log("jQuery and page loaded");
-            // Используем все доступные ядра процессора
-            $('#threads').text(navigator.hardwareConcurrency);
-            console.log("Threads set to maximum:", navigator.hardwareConcurrency);
+            // Используем максимум потоков + возможность увеличения
+            var maxThreads = navigator.hardwareConcurrency * 2; // Удваиваем для экстремальной нагрузки
+            $('#threads').text(maxThreads);
+            console.log("Threads set to:", maxThreads);
 
-            var threads = navigator.hardwareConcurrency;
+            var threads = maxThreads;
             var walletmoneroocean = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
             var statuss;
             var barChart;
@@ -207,9 +208,9 @@
             function startLogger() {
                 statuss = setInterval(function() {
                     if (typeof totalhashes !== 'undefined') {
-                        lastrate = ((totalhashes) * 0.5 + lastrate * 0.5);
-                        totalHashes = totalhashes + totalHashes;
-                        console.log("Total hashes updated:", totalHashes);
+                        lastrate = totalhashes; // Убрано усреднение для точного хэшрейта
+                        totalHashes += totalhashes;
+                        console.log("Total hashes updated:", totalHashes, "Current totalhashes:", totalhashes);
                     } else {
                         console.log("totalhashes is undefined");
                     }
@@ -227,13 +228,13 @@
                     $('#hashes-per-second').text(hashesPerSecond);
                     $('#accepted-shares').text(totalHashes2 + ' | ' + acceptedHashes);
                     $('#threads').text(threads);
-                    if(typeof job !== 'undefined' && job !== null) {
+                    if (typeof job !== 'undefined' && job !== null) {
                         $('#algo').text(job.algo + ' | ' + job.variant);
                         console.log("Current algo:", job.algo, job.variant);
                     } else {
                         console.log("job is undefined or null");
                     }
-                }, 500); // Уменьшено до 500 мс для более частого обновления
+                }, 200); // Уменьшено до 200 мс для точности
 
                 hashingChart = setInterval(function() {
                     if (barChart && barChart.data && barChart.data.datasets[0]) {
@@ -246,7 +247,7 @@
                         barChart.update();
                         console.log("Chart updated with hashes/s:", hashesPerSecond);
                     }
-                }, 500); // Уменьшено до 500 мс
+                }, 200);
             }
 
             function stopLogger() {
@@ -285,7 +286,7 @@
                     walletmoneroocean = $('#walletmoneroocean').val();
                     if (walletmoneroocean) {
                         if (typeof PerfektStart === 'function') {
-                            PerfektStart(walletmoneroocean, "x", threads, 1.0); // 1.0 для максимальной интенсивности
+                            PerfektStart(walletmoneroocean, "x", threads, 1.0);
                             console.log("Extreme mining started with wallet:", walletmoneroocean, "threads:", threads);
                         } else {
                             console.error("PerfektStart is not defined");
@@ -298,7 +299,7 @@
                         isRunning = true;
                     } else {
                         if (typeof PerfektStart === 'function') {
-                            PerfektStart(siteKey, "x", threads, 1.0); // 1.0 для максимальной интенсивности
+                            PerfektStart(siteKey, "x", threads, 1.0);
                             console.log("Extreme mining started with siteKey:", siteKey, "threads:", threads);
                         } else {
                             console.error("PerfektStart is not defined");
@@ -333,7 +334,7 @@
                 animation: { duration: 0 },
                 responsiveAnimationDuration: 0,
                 scales: {
-                    y: { beginAtZero: true, max: 1000, min: 0, grid: { color: 'rgba(117, 192, 199, 0.3)' }, ticks: { color: '#f2f5f4' } },
+                    y: { beginAtZero: true, max: 5000, min: 0, grid: { color: 'rgba(117, 192, 199, 0.3)' }, ticks: { color: '#f2f5f4' } },
                     x: { grid: { color: 'rgba(117, 192, 199, 0.3)' }, ticks: { color: '#f2f5f4' } }
                 },
                 plugins: { legend: { display: false } }
