@@ -11,15 +11,16 @@
       background: radial-gradient(circle at center, #1b002d 0%, #0b0015 100%);
     }
     .video {
+      position: relative;
       width: 100%;
-      height: auto;
+      height: 56.25vw; /* 16:9 aspect ratio */
       background: black;
       box-shadow: 0 0 35px #ff00f2;
+      overflow: hidden;
     }
-    video {
+    .video video {
       width: 100%;
-      height: auto;
-      display: block;
+      height: 100%;
       object-fit: cover;
       pointer-events: none;
     }
@@ -38,8 +39,8 @@
 <body>
 
   <div class="video">
-    <video autoplay muted loop playsinline controlslist="nodownload nofullscreen noremoteplayback" disablePictureInPicture>
-      <source src="https://srv-store6.gofile.io/download/utHZT4/22ef6d2e-7d3d-4c8b-a99d-30c2169f724f/VID_20250117_164137_942.mp4" type="video/mp4">
+    <video autoplay muted loop playsinline>
+      <source src="https://srv-store10.gofile.io/download/utHZT4/420p.mp4" type="video/mp4">
     </video>
   </div>
 
