@@ -2,105 +2,61 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Баннеры под изображением</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Баннер под изображением</title>
   <style>
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #000;
-      overflow: hidden;
-    }
-
-    .container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-
-    .banner-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 8px;
-      padding: 8px;
-      height: 100%;
-      overflow-y: auto;
-      z-index: 1;
-    }
-
-    .banner {
-      width: 100%;
-      height: 250px;
       background-color: #111;
+      color: #fff;
+      font-family: sans-serif;
     }
-
-    .overlay-image {
-      position: absolute;
-      top: 0;
-      left: 0;
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+    }
+    .main-image {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 2;
-      pointer-events: none;
-      opacity: 0.85;
+      height: auto;
+      display: block;
+      margin-bottom: 20px;
+      border-radius: 10px;
     }
-
-    @media (max-width: 600px) {
-      .banner {
-        height: 200px;
-      }
+    .banner-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
     }
-
-    @media (max-width: 400px) {
-      .banner {
-        height: 150px;
-      }
+    .banner {
+      width: 300px;
+      height: 250px;
+      background: #222;
+      border-radius: 10px;
+      overflow: hidden;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <!-- Основное изображение -->
+    <img src="IMG_20250719_192733_771.jpg" alt="Главное изображение" class="main-image">
 
-<div class="container">
-  <div class="banner-grid">
-    <!-- Повторяющиеся баннеры -->
-    <!-- Просто продублируй блок ниже, сколько нужно -->
-
-    <!-- БАННЕР 1 -->
-    <div class="banner">
-      <script type="text/javascript">
-        atOptions = {
-          'key' : 'a3c6441495bba3b9a180be372364178d',
-          'format' : 'iframe',
-          'height' : 250,
-          'width' : 300,
-          'params' : {}
-        };
-      </script>
-      <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
+    <!-- Сетка баннеров -->
+    <div class="banner-grid">
+      <div class="banner">
+        <script type="text/javascript">
+          atOptions = {
+            'key' : 'a3c6441495bba3b9a180be372364178d',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
+      </div>
     </div>
-
-    <!-- БАННЕР 2 -->
-    <div class="banner">
-      <script type="text/javascript">
-        atOptions = {
-          'key' : 'a3c6441495bba3b9a180be372364178d',
-          'format' : 'iframe',
-          'height' : 250,
-          'width' : 300,
-          'params' : {}
-        };
-      </script>
-      <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-    </div>
-
-    <!-- Продолжай дублировать блок <div class="banner">...</div> по необходимости -->
   </div>
-
-  <!-- Наложенное изображение -->
-  <img src="IMG_20250719_192733_771.jpg" alt="Overlay" class="overlay-image">
-</div>
-
 </body>
 </html>
