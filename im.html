@@ -13,16 +13,19 @@
     .video {
       position: relative;
       width: 100%;
-      height: 56.25vw; /* 16:9 aspect ratio */
+      height: 56.25vw; /* 16:9 */
       background: black;
       box-shadow: 0 0 35px #ff00f2;
       overflow: hidden;
     }
-    .video video {
+    .video iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      pointer-events: none;
+      border: none;
+      pointer-events: none; /* отключает взаимодействие */
     }
     .iframes {
       display: flex;
@@ -39,9 +42,11 @@
 <body>
 
   <div class="video">
-    <video autoplay muted loop playsinline>
-      <source src="https://gofile.io/d/utHZT4" type="video/mp4">
-    </video>
+    <iframe 
+      src="https://player.vimeo.com/video/1102937649?autoplay=1&loop=1&muted=1&background=1"
+      allow="autoplay; fullscreen" 
+      allowfullscreen>
+    </iframe>
   </div>
 
   <div class="iframes">
