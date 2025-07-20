@@ -42,6 +42,9 @@
             opacity: 0.7; /* Adjust opacity as needed */
             max-width: 80%;
             max-height: 80%;
+            cursor: pointer; /* Indicates the image is clickable */
+            /* Optional: Allow clicks to pass through the image to banners */
+            /* pointer-events: none; */
         }
         .image-overlay img {
             width: 100%;
@@ -54,8 +57,8 @@
     <div class="banner-container">
         <!-- Banners will be dynamically inserted here -->
     </div>
-    <div class="image-overlay">
-        <img IMG_20250719_192733_771.jpg" alt="Overlay Image">
+    <div class="image-overlay" onclick="window.location.href='https://example.com';">
+        <img src="file-service://file-HQ4zLZ9aZjUFLipGY3BiK8" alt="Overlay Image">
     </div>
     <script type="text/javascript">
         // Banner configuration
