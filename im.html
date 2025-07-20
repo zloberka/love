@@ -2,19 +2,19 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Abuse Click Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Абуз кликбейт</title>
   <style>
     body {
       margin: 0;
-      background-color: #0d0d0d;
-      font-family: Arial, sans-serif;
+      background: #000;
       color: white;
+      font-family: sans-serif;
     }
 
     iframe {
-      width: 100%;
       border: none;
-      display: block;
+      width: 100%;
     }
 
     .top-iframe {
@@ -23,59 +23,48 @@
 
     .button-bar {
       text-align: center;
-      padding: 15px 0;
+      margin: 20px 0;
     }
 
     .button-bar button {
-      padding: 10px 30px;
       background: #8000ff;
-      border: none;
       color: white;
-      border-radius: 25px;
-      font-size: 16px;
+      border: none;
+      padding: 12px 30px;
+      font-size: 18px;
+      border-radius: 30px;
       cursor: pointer;
-      box-shadow: 0 0 15px #8000ff;
+      box-shadow: 0 0 10px #8000ff;
     }
 
-    .abuse-area {
+    .banner-area {
       position: relative;
       width: 100%;
-      max-width: 900px;
-      margin: 20px auto;
-      height: 500px;
+      max-width: 1000px;
+      margin: 0 auto;
+      height: 510px; /* 2 ряда по 250px + отступ */
     }
 
-    .abuse-area .overlay-img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 2;
-      pointer-events: none; /* Важно: позволяет кликам проходить сквозь изображение */
-    }
-
-    .abuse-area .banner-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(2, 1fr);
-      gap: 10px;
-      width: 100%;
-      height: 100%;
+    .banner-scripts {
       position: absolute;
       top: 0;
       left: 0;
       z-index: 1;
     }
 
-    .abuse-area .banner-slot {
+    .cover-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
       width: 100%;
       height: 100%;
+      pointer-events: none; /* ВАЖНО: чтобы клики проходили сквозь */
     }
 
     .bottom-iframe {
       height: 30vh;
+      margin-top: 40px;
     }
   </style>
 </head>
@@ -89,11 +78,12 @@
     <button>CREATE AI GIRL</button>
   </div>
 
-  <!-- Область с баннерами и изображением -->
-  <div class="abuse-area">
-    <!-- Баннеры через JS -->
-    <div class="banner-grid">
-      <div class="banner-slot"><script type="text/javascript">
+  <!-- Блок с баннерами и наложенным изображением -->
+  <div class="banner-area">
+    
+    <!-- Баннеры -->
+    <div class="banner-scripts">
+      <script type="text/javascript">
         atOptions = {
           'key' : 'a3c6441495bba3b9a180be372364178d',
           'format' : 'iframe',
@@ -101,19 +91,10 @@
           'width' : 300,
           'params' : {}
         };
-      </script><script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script></div>
-      
-      <div class="banner-slot"><script type="text/javascript">
-        atOptions = {
-          'key' : 'a3c6441495bba3b9a180be372364178d',
-          'format' : 'iframe',
-          'height' : 250,
-          'width' : 300,
-          'params' : {}
-        };
-      </script><script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script></div>
+      </script>
+      <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
 
-      <div class="banner-slot"><script type="text/javascript">
+      <script type="text/javascript">
         atOptions = {
           'key' : 'a3c6441495bba3b9a180be372364178d',
           'format' : 'iframe',
@@ -121,9 +102,10 @@
           'width' : 300,
           'params' : {}
         };
-      </script><script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script></div>
+      </script>
+      <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
 
-      <div class="banner-slot"><script type="text/javascript">
+      <script type="text/javascript">
         atOptions = {
           'key' : 'a3c6441495bba3b9a180be372364178d',
           'format' : 'iframe',
@@ -131,31 +113,12 @@
           'width' : 300,
           'params' : {}
         };
-      </script><script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script></div>
-
-      <div class="banner-slot"><script type="text/javascript">
-        atOptions = {
-          'key' : 'a3c6441495bba3b9a180be372364178d',
-          'format' : 'iframe',
-          'height' : 250,
-          'width' : 300,
-          'params' : {}
-        };
-      </script><script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script></div>
-
-      <div class="banner-slot"><script type="text/javascript">
-        atOptions = {
-          'key' : 'a3c6441495bba3b9a180be372364178d',
-          'format' : 'iframe',
-          'height' : 250,
-          'width' : 300,
-          'params' : {}
-        };
-      </script><script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script></div>
+      </script>
+      <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
     </div>
 
-    <!-- Картинка поверх баннеров -->
-    <img class="overlay-img" src="IMG_20250719_192733_771.jpg" alt="Clickable Image">
+    <!-- Изображение поверх баннеров -->
+    <img class="cover-image" src="IMG_20250719_192733_771.jpg" alt="Cover Image">
   </div>
 
   <!-- Нижний iframe -->
