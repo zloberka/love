@@ -1,99 +1,117 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сайт с большой картинкой и рекламной плиткой</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Responsive Ad Banner Grid</title>
     <style>
-        .image-container {
-            position: relative;
+        body {
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100%;
-            max-width: 1200px; /* Ограничиваем размер контейнера */
-            height: 600px; /* Фиксированная высота для большой картинки */
-            background-image: url('IMG_20250719_192733_771.jpg'); /* Замените на ваш URL или путь */
-            background-size: cover;
-            background-position: center;
-            border-radius: 12px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            min-height: 100vh;
+            background-color: #f0f0f0;
         }
-        .ad-grid {
+        .grid-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2x2 плитка */
-            gap: 10px;
-            width: 80%;
-            height: 80%;
-            position: absolute;
-            top: 10%;
-            left: 10%;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 0;
+            width: 100%;
+            max-width: 900px;
+            box-sizing: border-box;
         }
-        .ad-banner {
-            position: relative;
-            z-index: 10;
+        .grid-item {
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+        }
+        .grid-item iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
-<body class="bg-gradient-to-r from-blue-600 to-purple-600 min-h-screen flex flex-col items-center justify-center">
-    <div class="container mx-auto p-4">
-        <h1 class="text-4xl font-bold text-white text-center mb-8">Галерея с рекламой</h1>
-        <div class="image-container">
-            <div class="ad-grid">
-                <!-- Баннер 1 -->
-                <div class="ad-banner">
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key': 'a3c6441495bba3b9a180be372364178d',
-                            'format': 'iframe',
-                            'height': 250,
-                            'width': 300,
-                            'params': {}
-                        };
-                    </script>
-                    <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-                </div>
-                <!-- Баннер 2 -->
-                <div class="ad-banner">
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key': 'a3c6441495bba3b9a180be372364178d',
-                            'format': 'iframe',
-                            'height': 250,
-                            'width': 300,
-                            'params': {}
-                        };
-                    </script>
-                    <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-                </div>
-                <!-- Баннер 3 -->
-                <div class="ad-banner">
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key': 'a3c6441495bba3b9a180be372364178d',
-                            'format': 'iframe',
-                            'height': 250,
-                            'width': 300,
-                            'params': {}
-                        };
-                    </script>
-                    <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-                </div>
-                <!-- Баннер 4 -->
-                <div class="ad-banner">
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key': 'a3c6441495bba3b9a180be372364178d',
-                            'format': 'iframe',
-                            'height': 250,
-                            'width': 300,
-                            'params': {}
-                        };
-                    </script>
-                    <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-                </div>
-            </div>
+<body>
+    <div class="grid-container">
+        <div class="grid-item">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : 'a3c6441495bba3b9a180be372364178d',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
+        </div>
+        <div class="grid-item">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : 'a3c6441495bba3b9a180be372364178d',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
+        </div>
+        <div class="grid-item">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : 'a3c6441495bba3b9a180be372364178d',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
+        </div>
+        <div class="grid-item">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : 'a3c6441495bba3b9a180be372364178d',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
+        </div>
+        <div class="grid-item">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : 'a3c6441495bba3b9a180be372364178d',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
+        </div>
+        <div class="grid-item">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : 'a3c6441495bba3b9a180be372364178d',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
         </div>
     </div>
 </body>
