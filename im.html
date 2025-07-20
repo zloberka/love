@@ -2,116 +2,96 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Баннерная Плитка</title>
+  <title>Баннеры под изображением</title>
   <style>
     body {
       margin: 0;
-      background-color: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      background-color: #000;
+      overflow-x: hidden;
     }
 
-    .grid-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 15px;
-      padding: 20px;
+    .wrapper {
+      position: relative;
       width: 100%;
-      max-width: 1200px;
-      box-sizing: border-box;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .overlay-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      opacity: 0.85; /* Прозрачность */
+      z-index: 2;
+      pointer-events: none; /* Чтобы не мешало кликам по баннерам */
+    }
+
+    .banners {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px 0;
+      z-index: 1;
+      position: relative;
     }
 
     .banner {
-      width: 100%;
+      width: 300px;
       height: 250px;
+      background: #111;
+      border-radius: 10px;
       overflow: hidden;
-      background: #000;
     }
   </style>
 </head>
 <body>
-  <div class="grid-container">
-    <div class="banner">
-      <script type="text/javascript">
-        atOptions = {
-          'key': 'a3c6441495bba3b9a180be372364178d',
-          'format': 'iframe',
-          'height': 250,
-          'width': 300,
-          'params': {}
-        };
-      </script>
-      <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-    </div>
+  <div class="wrapper">
+    <!-- Изображение поверх -->
+    <img src="IMG_20250719_192733_771.jpg" class="overlay-image" alt="Overlay">
 
-    <div class="banner">
-      <script type="text/javascript">
-        atOptions = {
-          'key': 'a3c6441495bba3b9a180be372364178d',
-          'format': 'iframe',
-          'height': 250,
-          'width': 300,
-          'params': {}
-        };
-      </script>
-      <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-    </div>
+    <!-- Баннеры под изображением -->
+    <div class="banners">
+      <div class="banner">
+        <script type="text/javascript">
+          atOptions = {
+            'key' : 'a3c6441495bba3b9a180be372364178d',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
+      </div>
 
-    <div class="banner">
-      <script type="text/javascript">
-        atOptions = {
-          'key': 'a3c6441495bba3b9a180be372364178d',
-          'format': 'iframe',
-          'height': 250,
-          'width': 300,
-          'params': {}
-        };
-      </script>
-      <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-    </div>
+      <!-- Можно просто копировать блок .banner чтобы добавить больше -->
+      <div class="banner">
+        <script type="text/javascript">
+          atOptions = {
+            'key' : 'a3c6441495bba3b9a180be372364178d',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
+      </div>
 
-    <div class="banner">
-      <script type="text/javascript">
-        atOptions = {
-          'key': 'a3c6441495bba3b9a180be372364178d',
-          'format': 'iframe',
-          'height': 250,
-          'width': 300,
-          'params': {}
-        };
-      </script>
-      <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-    </div>
-
-    <div class="banner">
-      <script type="text/javascript">
-        atOptions = {
-          'key': 'a3c6441495bba3b9a180be372364178d',
-          'format': 'iframe',
-          'height': 250,
-          'width': 300,
-          'params': {}
-        };
-      </script>
-      <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-    </div>
-
-    <div class="banner">
-      <script type="text/javascript">
-        atOptions = {
-          'key': 'a3c6441495bba3b9a180be372364178d',
-          'format': 'iframe',
-          'height': 250,
-          'width': 300,
-          'params': {}
-        };
-      </script>
-      <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
+      <div class="banner">
+        <script type="text/javascript">
+          atOptions = {
+            'key' : 'a3c6441495bba3b9a180be372364178d',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
+      </div>
     </div>
   </div>
 </body>
