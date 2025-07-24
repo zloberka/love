@@ -2,64 +2,96 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>💜</title>
+  <title>💜 Pleasure Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="shortcut icon" href="https://www.iconarchive.com/download/i98467/dakirby309/simply-styled/YouTube.ico">
+  <link rel="icon" href="https://www.iconarchive.com/download/i98467/dakirby309/simply-styled/YouTube.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
   <style>
-    body {
+    * {
       margin: 0;
-      background: radial-gradient(circle at center, #1b002d 0%, #0b0015 100%);
+      padding: 0;
+      box-sizing: border-box;
     }
-    .video {
+
+    body {
+      background: linear-gradient(145deg, #100015, #20002c);
+      font-family: 'Orbitron', sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    .video-wrapper {
       position: relative;
       width: 100%;
-      padding-top: 56.25%; /* 16:9 aspect ratio */
+      padding-top: 56.25%;
       background: black;
-      box-shadow: 0 0 35px #ff00f2;
+      box-shadow: 0 0 40px 10px #ff00f288;
+      margin-bottom: 20px;
     }
-    .video iframe {
+
+    .video-wrapper iframe {
       position: absolute;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       width: 100%;
       height: 100%;
       border: none;
-      pointer-events: none;
+      z-index: 2;
     }
-    .iframes {
-      display: flex;
-      flex-direction: column;
-      height: calc(100vh - 56.25vw);
+
+    .if-section {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 20px;
+      background: radial-gradient(circle at top, #320045, #0a0012);
+      box-shadow: inset 0 0 100px #ff00f230;
     }
-    .iframes iframe {
-      flex: 1;
+
+    .if-section iframe {
       width: 100%;
+      height: 300px;
       border: none;
+      box-shadow: 0 0 20px #ff00c880;
+      transition: transform 0.4s ease;
+    }
+
+    .if-section iframe:hover {
+      transform: scale(1.02);
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      color: #aaa;
+      font-size: 0.85em;
+      background: #0d0015;
     }
   </style>
 </head>
 <body>
 
-<div style="overflow: hidden; width: 100%; height: 300px;">
-  <iframe
-    src="https://streamtape.to/e/OVxmmved6etZRv7/"
-    width="100%"
-    height="300"
-    allowtransparency
-    allowfullscreen
-    allow="autoplay"
-    scrolling="no"
-    frameborder="0"
-    style="transform: scale(1.01); border: none;"
-  ></iframe>
-</div>
+  <!-- ВИДЕО -->
+  <div class="video-wrapper">
+    <iframe 
+      src="https://streamtape.to/e/OVxmmved6etZRv7/"
+      allowfullscreen
+      allow="autoplay"
+      scrolling="no"
+    ></iframe>
+  </div>
 
-  <div class="iframes">
+  <!-- БЛОКИ С ССЫЛКАМИ / РЕКЛАМОЙ -->
+  <div class="if-section">
     <iframe src="https://biieiae.flirtosmart.com/s/4e05b3267d2c9"></iframe>
     <iframe src="https://www.profitableratecpm.com/ntj9pgvcxz?key=2b927614358002f8d6d3d14e87b29ac5"></iframe>
   </div>
 
-  <!-- Скрипты -->
+  <!-- ФУТЕР -->
+  <footer>
+    💜 Powered by pleasure – Stream & Earn | All rights reserved © 2025
+  </footer>
+
+  <!-- СКРИПТЫ -->
   <script type='text/javascript' src='//pl27198253.profitableratecpm.com/c9/0d/35/c90d35792e2f95a047f528e420a70dff.js'></script>
   <script defer src="https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbdaad.link/381074/3788/0?bo=3471%2C3472%2C3473%2C3474%2C3475&target=pushnotifications&po=6456&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018"></script>
 
