@@ -2,84 +2,48 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Баннеры под изображением</title>
+  <title>Баннер под изображением</title>
   <style>
     body {
       margin: 0;
-      background-color: #000;
-      overflow-x: hidden;
+      background-color: #111;
+      color: #fff;
+      font-family: sans-serif;
     }
-
-    .wrapper {
-      position: relative;
-      width: 100%;
+    .container {
       max-width: 1000px;
-      margin: 0 auto;
+      margin: auto;
+      padding: 20px;
     }
-
-    .overlay-image {
-      position: absolute;
-      top: 0;
-      left: 0;
+    .main-image {
       width: 100%;
-      opacity: 0.85; /* Прозрачность */
-      z-index: 2;
-      pointer-events: none; /* Чтобы не мешало кликам по баннерам */
+      height: auto;
+      display: block;
+      margin-bottom: 20px;
+      border-radius: 10px;
     }
-
-    .banners {
+    .banner-grid {
       display: flex;
       flex-wrap: wrap;
+      gap: 15px;
       justify-content: center;
-      gap: 10px;
-      padding: 20px 0;
-      z-index: 1;
-      position: relative;
     }
-
     .banner {
       width: 300px;
       height: 250px;
-      background: #111;
+      background: #222;
       border-radius: 10px;
       overflow: hidden;
     }
   </style>
 </head>
 <body>
-  <div class="wrapper">
-    <!-- Изображение поверх -->
-    <img src="IMG_20250719_192733_771.jpg" class="overlay-image" alt="Overlay">
+  <div class="container">
+    <!-- Основное изображение -->
+    <img src="IMG_20250719_192733_771.jpg" alt="Главное изображение" class="main-image">
 
-    <!-- Баннеры под изображением -->
-    <div class="banners">
-      <div class="banner">
-        <script type="text/javascript">
-          atOptions = {
-            'key' : 'a3c6441495bba3b9a180be372364178d',
-            'format' : 'iframe',
-            'height' : 250,
-            'width' : 300,
-            'params' : {}
-          };
-        </script>
-        <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-      </div>
-
-      <!-- Можно просто копировать блок .banner чтобы добавить больше -->
-      <div class="banner">
-        <script type="text/javascript">
-          atOptions = {
-            'key' : 'a3c6441495bba3b9a180be372364178d',
-            'format' : 'iframe',
-            'height' : 250,
-            'width' : 300,
-            'params' : {}
-          };
-        </script>
-        <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-      </div>
-
+    <!-- Сетка баннеров -->
+    <div class="banner-grid">
       <div class="banner">
         <script type="text/javascript">
           atOptions = {
