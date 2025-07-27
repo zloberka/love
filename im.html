@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Ad Banner Grid with Overlay</title>
+    <title>Ad Banner Grid with Overlay</title>
     <style>
         body {
             margin: 0;
@@ -13,8 +13,6 @@
             align-items: center;
             min-height: 100vh;
             background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
-            position: relative;
         }
         .grid-container {
             display: grid;
@@ -22,51 +20,31 @@
             gap: 0;
             width: 100%;
             max-width: 900px;
-            box-sizing: border-box;
             position: relative;
-            z-index: 1;
         }
         .grid-item {
             width: 100%;
             height: 250px;
             overflow: hidden;
-            position: relative;
         }
         .grid-item iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
-        .grid-item::after {
-            content: 'Ad failed to load';
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #888;
-            font-size: 14px;
-        }
-        .grid-item:empty::after {
-            display: block;
-        }
-        .overlay {
+        .overlay-image {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('IMG_20250719_192733_771.jpg') no-repeat center;
-            background-size: cover;
-            z-index: 2;
-            pointer-events: none; /* Allows clicks to pass through to banners */
+            object-fit: cover;
+            pointer-events: none;
+            z-index: 1;
         }
         @media (max-width: 600px) {
             .grid-container {
                 grid-template-columns: 1fr;
-            }
-            .overlay {
-                background-size: contain;
             }
         }
     </style>
@@ -145,7 +123,7 @@
             </script>
             <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
         </div>
+        <img src="IMG_20250719_192733_771.jpg" alt="Overlay Image" class="overlay-image">
     </div>
-    <div class="overlay"></div>
 </body>
 </html>
