@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overlay Image on Banner Grid</title>
+    <title>Transparent Overlay on Banner Grid</title>
     <style>
         body {
             margin: 0;
@@ -22,6 +22,7 @@
             width: 100%;
             max-width: 900px;
             box-sizing: border-box;
+            z-index: 1;
         }
         .grid-item {
             width: 100%;
@@ -35,28 +36,28 @@
         }
         .overlay {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            max-width: 900px;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: auto;
+            height: 100%;
+            max-width: 900px;
             z-index: 10;
         }
         .overlay a {
             display: block;
-        }
-        .overlay img {
             width: 100%;
-            height: auto;
-            display: block;
+            height: 100%;
+            background: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD/2wBDAAoHBwkHBgoJCAkLCwoMDxkPCg0...') no-repeat center;
+            background-size: cover;
+            opacity: 0.01; /* Nearly transparent */
         }
         @media (max-width: 600px) {
             .grid-container {
                 grid-template-columns: 1fr;
             }
-            .overlay {
+            .overlay a {
                 max-width: 300px;
+                margin: 0 auto;
             }
         }
     </style>
@@ -137,9 +138,7 @@
         </div>
     </div>
     <div class="overlay">
-        <a href="#" target="_blank">
-            <img src="IMG_20250719_192733_771.jpg" alt="Clickable Overlay">
-        </a>
+        <a href="#" target="_blank"></a>
     </div>
 </body>
 </html>
