@@ -36,6 +36,7 @@
     .grid-container {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(5, 1fr);
       gap: 0;
       width: 100%;
       height: 100%;
@@ -43,7 +44,7 @@
     }
     .grid-item {
       width: 100%;
-      height: 20%; /* Adjusted for 5 rows in 40% height */
+      height: 100%;
       overflow: hidden;
     }
     .grid-item iframe {
@@ -64,7 +65,7 @@
     @media (max-width: 600px) {
       .grid-container {
         grid-template-columns: 1fr;
-        grid-template-rows: repeat(15, 20%);
+        grid-template-rows: repeat(15, 1fr);
       }
     }
   </style>
