@@ -3,211 +3,455 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ascaris Lifecycle Simulator</title>
+    <title>Ascaris: Internal Ecosystem</title>
     <style>
-        body { 
-            margin: 0; 
-            overflow: hidden; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: #fff;
         }
-        canvas { 
-            display: block; 
+        canvas {
+            display: block;
         }
-        .ui-overlay {
+        #ui-container {
             position: absolute;
-            bottom: 20px;
+            top: 20px;
             left: 20px;
-            background: rgba(0,0,0,0.7);
-            color: #4CAF50;
-            padding: 15px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .stats-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #4CAF50;
             border-radius: 10px;
-            max-width: 300px;
-            font-size: 14px;
-            line-height: 1.5;
+            padding: 15px;
+            margin-bottom: 10px;
+            min-width: 250px;
             box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+        }
+        .stats-panel h3 {
+            margin: 0 0 10px 0;
+            color: #4CAF50;
+            text-align: center;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .controls-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #2196F3;
+            border-radius: 10px;
+            padding: 15px;
+            min-width: 250px;
+            box-shadow: 0 0 20px rgba(33, 150, 243, 0.3);
+        }
+        .controls-panel h3 {
+            margin: 0 0 10px 0;
+            color: #2196F3;
+            text-align: center;
+        }
+        .control-item {
+            font-size: 13px;
+            line-height: 1.4;
+            opacity: 0.9;
         }
         .stage-indicator {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(0,0,0,0.7);
-            color: #FFD700;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #FF9800;
+            color: #FF9800;
             padding: 10px 20px;
-            border-radius: 30px;
+            border-radius: 20px;
             font-weight: bold;
-            font-size: 18px;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            font-size: 16px;
+            box-shadow: 0 0 15px rgba(255, 152, 0, 0.4);
+            pointer-events: none;
         }
-        .instructions {
+        .tutorial {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #4CAF50;
             color: white;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 30px;
+            border-radius: 15px;
             text-align: center;
             max-width: 500px;
-            animation: fadeIn 2s;
+            animation: fadeIn 1s;
+            z-index: 100;
         }
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        .tutorial h2 {
+            color: #4CAF50;
+            margin-top: 0;
+        }
+        .tutorial button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .tutorial button:hover {
+            background: #45a049;
+        }
+        .minimap {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 150px;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #9C27B0;
+            border-radius: 10px;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .minimap-canvas {
+            width: 100%;
+            height: 100%;
+        }
+        .health-bar {
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            margin: 5px 0;
+            overflow: hidden;
+        }
+        .health-fill {
+            height: 100%;
+            background: #4CAF50;
+            width: 100%;
+            transition: width 0.3s;
+        }
+        .energy-bar {
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            margin: 5px 0;
+            overflow: hidden;
+        }
+        .energy-fill {
+            height: 100%;
+            background: #2196F3;
+            width: 100%;
+            transition: width 0.3s;
+        }
+        .stage-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #FF9800;
+            color: #000;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="stage-indication">Egg Stage</div>
-    <div class="ui-overlay">
-        <h3>Ascaris Lifecycle Simulator</h3>
-        <p>WASD to move | Mouse to look around | Space to accelerate</p>
-        <p>Current stage: Egg (will develop in 30s)</p>
-        <div id="progress-bar" style="width: 100%; background: #333; height: 10px; border-radius: 5px; margin-top: 10px;">
-            <div id="progress" style="width: 0%; height: 100%; background: #4CAF50; border-radius: 5px;"></div>
+    <div id="ui-container">
+        <div class="stats-panel">
+            <h3>Ascaris Status</h3>
+            <div class="stat-row">
+                <span>Stage:</span>
+                <span><span class="stage-badge">EGG</span></span>
+            </div>
+            <div class="stat-row">
+                <span>Health:</span>
+                <span>100%</span>
+            </div>
+            <div class="health-bar">
+                <div class="health-fill" id="health-fill"></div>
+            </div>
+            <div class="stat-row">
+                <span>Energy:</span>
+                <span>100%</span>
+            </div>
+            <div class="energy-bar">
+                <div class="energy-fill" id="energy-fill"></div>
+            </div>
+            <div class="stat-row">
+                <span>Size:</span>
+                <span>0.05mm</span>
+            </div>
+            <div class="stat-row">
+                <span>Location:</span>
+                <span>Small Intestine</span>
+            </div>
+        </div>
+        
+        <div class="controls-panel">
+            <h3>Controls</h3>
+            <div class="control-item">WASD / Arrows: Move</div>
+            <div class="control-item">Mouse: Look around</div>
+            <div class="control-item">Space: Accelerate</div>
+            <div class="control-item">Shift: Conserve energy</div>
+            <div class="control-item">E: Interact/Feed</div>
+            <div class="control-item">Q: Cycle organs</div>
         </div>
     </div>
-    <div class="instructions">
-        <h2>Welcome to Ascaris Lifecycle Simulator</h2>
-        <p>Experience the incredible journey of Ascaris lumbricoides through the human body</p>
-        <p>Press any key to begin your biological adventure</p>
+    
+    <div class="stage-indicator">
+        <span class="stage-badge">EGG STAGE</span> - Developing
+    </div>
+    
+    <div class="minimap">
+        <canvas class="minimap-canvas" id="minimap"></canvas>
+    </div>
+
+    <div class="tutorial" id="tutorial">
+        <h2>Welcome to Ascaris: Internal Ecosystem</h2>
+        <p>Experience life as a parasitic nematode inside a human host.</p>
+        <p>Your journey begins as an egg. Survive, grow, and explore the vast internal world.</p>
+        <p>Find nutrients, avoid immune cells, and complete your lifecycle.</p>
+        <button id="start-btn">Begin Your Journey</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/PointerLockControls.js"></script>
     <script>
+        // Game state
+        const gameState = {
+            stage: 'egg',
+            health: 100,
+            maxHealth: 100,
+            energy: 100,
+            maxEnergy: 100,
+            size: 0.05,
+            location: 'Small Intestine',
+            age: 0,
+            score: 0,
+            organs: ['Small Intestine', 'Large Intestine', 'Liver', 'Lungs', 'Heart', 'Muscles'],
+            currentOrgan: 0,
+            position: { x: 0, y: 0, z: 0 }
+        };
+
         // Initialize 3D scene
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x2a1d1d, 0.05);
+        scene.fog = new THREE.FogExp2(0x1a1212, 0.02);
         
         // Camera setup
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 0, 5);
+        camera.position.set(0, 0.5, 5);
         
         // Renderer
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(renderer.domElement);
         
         // Lighting
-        const ambientLight = new THREE.AmbientLight(0x404040, 1.5);
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
         scene.add(ambientLight);
         
-        const directionalLight = new THREE.DirectionalLight(0xffddcc, 1.2);
-        directionalLight.position.set(5, 10, 7);
-        directionalLight.castShadow = true;
-        directionalLight.shadow.mapSize.width = 1024;
-        directionalLight.shadow.mapSize.height = 1024;
-        scene.add(directionalLight);
+        const mainLight = new THREE.DirectionalLight(0xffddcc, 1.5);
+        mainLight.position.set(5, 10, 7);
+        mainLight.castShadow = true;
+        mainLight.shadow.mapSize.width = 2048;
+        mainLight.shadow.mapSize.height = 2048;
+        scene.add(mainLight);
         
-        const intestinalLight = new THREE.PointLight(0xffaa88, 0.8, 15);
-        intestinalLight.position.set(0, 0, 0);
-        scene.add(intestinalLight);
+        const bioLight = new THREE.PointLight(0x88ccff, 1.2, 20);
+        bioLight.position.set(0, 0, 0);
+        scene.add(bioLight);
+        
+        // Create organ systems
+        function createOrganSystem() {
+            const organs = new THREE.Group();
+            
+            // Generate procedural organ layout
+            const organPositions = [
+                { name: 'Small Intestine', pos: new THREE.Vector3(0, 0, -50), size: 8 },
+                { name: 'Large Intestine', pos: new THREE.Vector3(15, -2, -120), size: 10 },
+                { name: 'Liver', pos: new THREE.Vector3(-10, 8, -80), size: 12 },
+                { name: 'Lungs', pos: new THREE.Vector3(-5, 15, -60), size: 15 },
+                { name: 'Heart', pos: new THREE.Vector3(0, 12, -70), size: 10 },
+                { name: 'Muscles', pos: new THREE.Vector3(20, -5, -150), size: 20 }
+            ];
+            
+            organPositions.forEach(organ => {
+                // Create organ capsule
+                const capsuleGeometry = new THREE.SphereGeometry(organ.size, 32, 32);
+                const capsuleMaterial = new THREE.MeshPhongMaterial({
+                    color: getOrganColor(organ.name),
+                    transparent: true,
+                    opacity: 0.3,
+                    shininess: 20
+                });
+                const capsule = new THREE.Mesh(capsuleGeometry, capsuleMaterial);
+                capsule.position.copy(organ.pos);
+                capsule.castShadow = true;
+                organs.add(capsule);
+                
+                // Add organ name label
+                const label = createTextSprite(organ.name, 0.5);
+                label.position.set(organ.pos.x, organ.pos.y + organ.size + 2, organ.pos.z);
+                organs.add(label);
+            });
+            
+            return organs;
+        }
+        
+        function getOrganColor(organName) {
+            const colors = {
+                'Small Intestine': 0xddc1a5,
+                'Large Intestine': 0xc8a991,
+                'Liver': 0x8b4000,
+                'Lungs': 0xffc0cb,
+                'Heart': 0xdc143c,
+                'Muscles': 0xe9967a
+            };
+            return colors[organName] || 0xaaaaaa;
+        }
+        
+        function createTextSprite(text, fontSize) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 64;
+            const context = canvas.getContext('2d');
+            context.fillStyle = 'rgba(0,0,0,0)';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.font = `bold ${fontSize * 64}px Arial`;
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillStyle = 'rgba(255,255,255,0.9)';
+            context.fillText(text, canvas.width / 2, canvas.height / 2);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({ map: texture });
+            const sprite = new THREE.Sprite(material);
+            sprite.scale.set(5, 1.25, 1);
+            return sprite;
+        }
         
         // Create intestinal environment
-        function createIntestine() {
-            const intestineGroup = new THREE.Group();
+        function createIntestinalTract() {
+            const tract = new THREE.Group();
             
-            // Generate procedural intestine path
-            const pathPoints = [];
-            const segments = 200;
-            const radius = 8;
-            
-            for (let i = 0; i <= segments; i++) {
-                const angle = i * 0.03;
-                const x = Math.sin(angle * 1.5) * radius * (1 + i/segments * 0.2);
-                const y = Math.cos(angle * 0.8) * radius * (1 + i/segments * 0.3);
-                const z = i * 3 - 300;
-                pathPoints.push(new THREE.Vector3(x, y, z));
+            // Create main intestinal tube
+            const points = [];
+            for (let i = 0; i <= 100; i++) {
+                const t = i / 100 * Math.PI * 4;
+                const x = Math.sin(t * 0.5) * (5 + i * 0.1);
+                const y = Math.cos(t * 0.3) * (4 + i * 0.08);
+                const z = -i * 3;
+                points.push(new THREE.Vector3(x, y, z));
             }
             
-            // Create tube geometry
             const tubeGeometry = new THREE.TubeGeometry(
-                new THREE.CatmullRomCurve3(pathPoints),
-                200,
-                2.5,
+                new THREE.CatmullRomCurve3(points),
+                100,
+                3,
                 16,
                 false
             );
             
-            // Create realistic intestine material
-            const intestineMaterial = new THREE.MeshPhongMaterial({
+            const tubeMaterial = new THREE.MeshPhongMaterial({
                 color: 0xddc1a5,
                 specular: 0x333333,
                 shininess: 15,
                 side: THREE.DoubleSide,
                 transparent: true,
-                opacity: 0.85
+                opacity: 0.7
             });
             
-            // Add biological details
-            const intestineMesh = new THREE.Mesh(tubeGeometry, intestineMaterial);
-            intestineMesh.castShadow = true;
-            intestineMesh.receiveShadow = true;
-            intestineGroup.add(intestineMesh);
+            const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
+            tube.castShadow = true;
+            tube.receiveShadow = true;
+            tract.add(tube);
             
-            // Add villi details
-            for (let i = 0; i < 500; i++) {
-                const length = 0.3 + Math.random() * 0.7;
-                const geometry = new THREE.CylinderGeometry(0.05, 0.05, length, 8);
+            // Add villi
+            for (let i = 0; i < 800; i++) {
+                const length = 0.5 + Math.random() * 1.5;
+                const geometry = new THREE.CylinderGeometry(0.08, 0.08, length, 8);
                 const material = new THREE.MeshPhongMaterial({ 
                     color: 0xc8a991,
                     shininess: 5
                 });
                 const villus = new THREE.Mesh(geometry, material);
                 
-                // Position villi along the intestine
-                const pos = pathPoints[Math.floor(Math.random() * pathPoints.length)];
+                const pointIndex = Math.floor(Math.random() * points.length);
+                const pos = points[pointIndex];
                 villus.position.set(pos.x, pos.y, pos.z);
                 
-                // Random orientation
-                villus.rotation.set(
-                    Math.random() * Math.PI,
-                    Math.random() * Math.PI,
-                    Math.random() * Math.PI
-                );
+                // Orient villus outward from tube center
+                const normal = new THREE.Vector3(pos.x, pos.y, 0).normalize();
+                villus.lookAt(pos.clone().add(normal));
+                villus.rotateX(Math.PI / 2);
                 
-                // Scale based on position
-                const scale = 0.8 + Math.random() * 0.4;
-                villus.scale.set(scale, scale, scale);
-                
-                intestineGroup.add(villus);
+                tract.add(villus);
             }
             
-            return intestineGroup;
+            return tract;
         }
         
-        // Create Ascaris model
+        // Create Ascaris model with lifecycle stages
         function createAscaris() {
-            const ascarisGroup = new THREE.Group();
+            const ascaris = new THREE.Group();
             
-            // Body segments
-            const segments = 15;
-            const bodyParts = [];
-            
-            for (let i = 0; i < segments; i++) {
-                const radius = 0.3 - (i / segments) * 0.15;
-                const segmentGeometry = new THREE.CylinderGeometry(radius, radius, 0.8, 16);
-                
-                // Realistic color gradient
-                const r = 0.7 + (i / segments) * 0.2;
-                const g = 0.6 + (i / segments) * 0.2;
-                const b = 0.5 + (i / segments) * 0.2;
-                
-                const segmentMaterial = new THREE.MeshPhongMaterial({
-                    color: new THREE.Color(r, g, b),
+            // Create segmented body
+            const createBodySegment = (radius, zPos) => {
+                const geometry = new THREE.CylinderGeometry(radius, radius, 0.8, 16);
+                const material = new THREE.MeshPhongMaterial({
+                    color: 0x9c7a61,
                     shininess: 30
                 });
-                
-                const segment = new THREE.Mesh(segmentGeometry, segmentMaterial);
+                const segment = new THREE.Mesh(geometry, material);
                 segment.rotation.x = Math.PI / 2;
-                segment.position.z = -i * 0.7;
+                segment.position.z = zPos;
                 segment.castShadow = true;
-                ascarisGroup.add(segment);
-                bodyParts.push(segment);
+                return segment;
+            };
+            
+            // Initial egg stage
+            const eggGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+            const eggMaterial = new THREE.MeshPhongMaterial({
+                color: 0xffffcc,
+                shininess: 50,
+                transparent: true,
+                opacity: 0.9
+            });
+            const egg = new THREE.Mesh(eggGeometry, eggMaterial);
+            ascaris.add(egg);
+            ascaris.userData.egg = egg;
+            
+            // Larva body (hidden initially)
+            const larvaBody = new THREE.Group();
+            for (let i = 0; i < 10; i++) {
+                const segment = createBodySegment(0.25 - i * 0.015, -i * 0.6);
+                larvaBody.add(segment);
             }
+            larvaBody.visible = false;
+            ascaris.add(larvaBody);
+            ascaris.userData.larvaBody = larvaBody;
+            
+            // Adult body (hidden initially)
+            const adultBody = new THREE.Group();
+            for (let i = 0; i < 15; i++) {
+                const segment = createBodySegment(0.4 - i * 0.02, -i * 0.7);
+                adultBody.add(segment);
+            }
+            adultBody.visible = false;
+            ascaris.add(adultBody);
+            ascaris.userData.adultBody = adultBody;
             
             // Head details
             const headGeometry = new THREE.SphereGeometry(0.35, 16, 16);
@@ -217,29 +461,116 @@
             });
             const head = new THREE.Mesh(headGeometry, headMaterial);
             head.position.z = 0.1;
-            ascarisGroup.add(head);
+            head.visible = false;
+            ascaris.add(head);
+            ascaris.userData.head = head;
             
-            // Mouth details
+            // Mouth
             const mouthGeometry = new THREE.ConeGeometry(0.15, 0.3, 16);
             const mouthMaterial = new THREE.MeshPhongMaterial({ color: 0x5a0a0a });
             const mouth = new THREE.Mesh(mouthGeometry, mouthMaterial);
             mouth.rotation.x = Math.PI;
             mouth.position.z = 0.35;
-            ascarisGroup.add(mouth);
+            mouth.visible = false;
+            ascaris.add(mouth);
+            ascaris.userData.mouth = mouth;
             
-            // Add animation capability
-            ascarisGroup.animate = (time) => {
-                bodyParts.forEach((part, i) => {
-                    part.rotation.z = Math.sin(time * 2 + i * 0.5) * 0.2;
-                });
+            // Animation
+            ascaris.animate = (time, stage) => {
+                const body = ascaris.userData[stage + 'Body'];
+                if (body && body.visible) {
+                    body.children.forEach((part, i) => {
+                        part.rotation.z = Math.sin(time * 3 + i * 0.7) * 0.3;
+                    });
+                }
             };
             
-            return ascarisGroup;
+            return ascaris;
+        }
+        
+        // Create immune cells
+        function createImmuneCells() {
+            const cells = new THREE.Group();
+            
+            // Create various immune cells
+            for (let i = 0; i < 20; i++) {
+                const cellType = Math.floor(Math.random() * 3);
+                const geometry = cellType === 0 ? 
+                    new THREE.SphereGeometry(0.8, 16, 16) : 
+                    cellType === 1 ?
+                    new THREE.DodecahedronGeometry(0.7) :
+                    new THREE.IcosahedronGeometry(0.7);
+                
+                const material = new THREE.MeshPhongMaterial({
+                    color: cellType === 0 ? 0xff5555 : cellType === 1 ? 0x5555ff : 0x55ff55,
+                    shininess: 50
+                });
+                
+                const cell = new THREE.Mesh(geometry, material);
+                
+                // Random position in intestinal tract
+                const z = -Math.random() * 300;
+                const r = 2 + Math.random() * 3;
+                const angle = Math.random() * Math.PI * 2;
+                const x = Math.sin(angle) * r;
+                const y = Math.cos(angle) * r;
+                
+                cell.position.set(x, y, z);
+                cell.userData.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.2,
+                    (Math.random() - 0.5) * 0.2,
+                    (Math.random() - 0.5) * 0.2
+                );
+                
+                cells.add(cell);
+            }
+            
+            return cells;
+        }
+        
+        // Create nutrient particles
+        function createNutrients() {
+            const nutrients = new THREE.Group();
+            
+            for (let i = 0; i < 50; i++) {
+                const geometry = new THREE.SphereGeometry(0.2 + Math.random() * 0.3, 16, 16);
+                const material = new THREE.MeshPhongMaterial({
+                    color: 0xffff00,
+                    emissive: 0xffff00,
+                    emissiveIntensity: 0.5,
+                    shininess: 100
+                });
+                
+                const nutrient = new THREE.Mesh(geometry, material);
+                
+                // Position in intestinal tract
+                const z = -Math.random() * 300;
+                const r = 1 + Math.random() * 4;
+                const angle = Math.random() * Math.PI * 2;
+                const x = Math.sin(angle) * r;
+                const y = Math.cos(angle) * r;
+                
+                nutrient.position.set(x, y, z);
+                nutrient.userData.pulseTime = Math.random() * Math.PI * 2;
+                
+                nutrients.add(nutrient);
+            }
+            
+            return nutrients;
         }
         
         // Create environment
-        const intestine = createIntestine();
-        scene.add(intestine);
+        const organSystem = createOrganSystem();
+        scene.add(organSystem);
+        
+        const intestinalTract = createIntestinalTract();
+        scene.add(intestinalTract);
+        
+        const immuneCells = createImmuneCells();
+        scene.add(immuneCells);
+        
+        const nutrients = createNutrients();
+        scene.add(nutrients);
         
         // Create Ascaris
         const ascaris = createAscaris();
@@ -251,7 +582,10 @@
         let moveBackward = false;
         let moveLeft = false;
         let moveRight = false;
-        let canJump = false;
+        let moveUp = false;
+        let moveDown = false;
+        let accelerate = false;
+        let conserveEnergy = false;
         let velocity = new THREE.Vector3();
         let direction = new THREE.Vector3();
         
@@ -274,7 +608,17 @@
                     moveRight = true;
                     break;
                 case 'Space':
-                    velocity.y += 350;
+                    accelerate = true;
+                    break;
+                case 'ShiftLeft':
+                case 'ShiftRight':
+                    conserveEnergy = true;
+                    break;
+                case 'KeyE':
+                    interact();
+                    break;
+                case 'KeyQ':
+                    cycleOrgan();
                     break;
             }
         };
@@ -297,6 +641,13 @@
                 case 'KeyD':
                     moveRight = false;
                     break;
+                case 'Space':
+                    accelerate = false;
+                    break;
+                case 'ShiftLeft':
+                case 'ShiftRight':
+                    conserveEnergy = false;
+                    break;
             }
         };
         
@@ -304,36 +655,272 @@
         document.addEventListener('keyup', onKeyUp);
         
         // Pointer lock controls
-        const instruction = document.querySelector('.instructions');
-        instruction.addEventListener('click', function() {
+        const tutorial = document.getElementById('tutorial');
+        const startBtn = document.getElementById('start-btn');
+        
+        startBtn.addEventListener('click', function() {
+            tutorial.style.display = 'none';
             controls.lock();
         });
         
         controls = new THREE.PointerLockControls(camera, document.body);
         
         controls.addEventListener('lock', function() {
-            instruction.style.display = 'none';
+            tutorial.style.display = 'none';
         });
         
         controls.addEventListener('unlock', function() {
-            instruction.style.display = 'block';
+            if (tutorial.style.display !== 'none') return;
+            tutorial.style.display = 'block';
         });
+        
+        // Minimap
+        const minimapCanvas = document.getElementById('minimap');
+        const minimapCtx = minimapCanvas.getContext('2d');
+        
+        function updateMinimap() {
+            minimapCtx.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+            
+            // Draw organ positions
+            const organPositions = [
+                { x: 75, y: 75, name: 'SI' },
+                { x: 120, y: 100, name: 'LI' },
+                { x: 40, y: 60, name: 'L' },
+                { x: 60, y: 30, name: 'LU' },
+                { x: 75, y: 45, name: 'H' },
+                { x: 130, y: 120, name: 'M' }
+            ];
+            
+            organPositions.forEach(organ => {
+                minimapCtx.fillStyle = 'rgba(156, 39, 176, 0.3)';
+                minimapCtx.beginPath();
+                minimapCtx.arc(organ.x, organ.y, 15, 0, Math.PI * 2);
+                minimapCtx.fill();
+                
+                minimapCtx.fillStyle = '#9C27B0';
+                minimapCtx.font = '10px Arial';
+                minimapCtx.textAlign = 'center';
+                minimapCtx.textBaseline = 'middle';
+                minimapCtx.fillText(organ.name, organ.x, organ.y);
+            });
+            
+            // Draw player position
+            const playerX = 75 + (ascaris.position.x / 20) * 40;
+            const playerY = 75 - (ascaris.position.y / 15) * 40;
+            
+            minimapCtx.fillStyle = '#4CAF50';
+            minimapCtx.beginPath();
+            minimapCtx.arc(playerX, playerY, 5, 0, Math.PI * 2);
+            minimapCtx.fill();
+            
+            // Draw current organ indicator
+            const currentOrganPos = organPositions[gameState.currentOrgan];
+            minimapCtx.strokeStyle = '#FF9800';
+            minimapCtx.lineWidth = 2;
+            minimapCtx.beginPath();
+            minimapCtx.arc(currentOrganPos.x, currentOrganPos.y, 18, 0, Math.PI * 2);
+            minimapCtx.stroke();
+        }
+        
+        // Interaction functions
+        function interact() {
+            // Check for nearby nutrients
+            const ascarisPos = ascaris.position;
+            nutrients.children.forEach(nutrient => {
+                const distance = ascarisPos.distanceTo(nutrient.position);
+                if (distance < 2) {
+                    // Absorb nutrient
+                    nutrients.remove(nutrient);
+                    
+                    // Increase energy and health
+                    gameState.energy = Math.min(gameState.maxEnergy, gameState.energy + 20);
+                    gameState.health = Math.min(gameState.maxHealth, gameState.health + 10);
+                    gameState.score += 10;
+                    
+                    // Visual effect
+                    createAbsorptionEffect(nutrient.position);
+                }
+            });
+        }
+        
+        function createAbsorptionEffect(position) {
+            const particles = new THREE.Group();
+            for (let i = 0; i < 10; i++) {
+                const geometry = new THREE.SphereGeometry(0.1, 8, 8);
+                const material = new THREE.MeshBasicMaterial({
+                    color: 0xffff00,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const particle = new THREE.Mesh(geometry, material);
+                particle.position.copy(position);
+                particle.userData.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.5,
+                    (Math.random() - 0.5) * 0.5,
+                    (Math.random() - 0.5) * 0.5
+                );
+                particle.userData.life = 1.0;
+                particles.add(particle);
+            }
+            scene.add(particles);
+            
+            // Animate and remove
+            const effectAnimate = function() {
+                particles.children.forEach(particle => {
+                    particle.userData.life -= 0.02;
+                    particle.position.x += particle.userData.velocity.x;
+                    particle.position.y += particle.userData.velocity.y;
+                    particle.position.z += particle.userData.velocity.z;
+                    particle.material.opacity = particle.userData.life;
+                    particle.scale.setScalar(particle.userData.life);
+                });
+                
+                if (particles.children[0].userData.life <= 0) {
+                    scene.remove(particles);
+                } else {
+                    requestAnimationFrame(effectAnimate);
+                }
+            };
+            effectAnimate();
+        }
+        
+        function cycleOrgan() {
+            gameState.currentOrgan = (gameState.currentOrgan + 1) % gameState.organs.length;
+            gameState.location = gameState.organs[gameState.currentOrgan];
+            updateUI();
+        }
+        
+        // Lifecycle progression
+        function updateLifecycle(deltaTime) {
+            gameState.age += deltaTime;
+            
+            // Stage progression based on time
+            if (gameState.stage === 'egg' && gameState.age > 30) {
+                gameState.stage = 'larva';
+                gameState.size = 0.15;
+                evolveToLarva();
+                updateUI();
+            }
+            else if (gameState.stage === 'larva' && gameState.age > 90) {
+                gameState.stage = 'adult';
+                gameState.size = 0.3;
+                evolveToAdult();
+                updateUI();
+            }
+            
+            // Energy consumption
+            const energyRate = conserveEnergy ? 0.3 : 1.0;
+            gameState.energy = Math.max(0, gameState.energy - energyRate * deltaTime);
+            
+            // Health based on energy
+            if (gameState.energy < 20) {
+                gameState.health = Math.max(0, gameState.health - 0.5 * deltaTime);
+            }
+            
+            // Regeneration when well-fed
+            if (gameState.energy > 80 && gameState.health < gameState.maxHealth) {
+                gameState.health = Math.min(gameState.maxHealth, gameState.health + 0.8 * deltaTime);
+            }
+        }
+        
+        function evolveToLarva() {
+            ascaris.userData.egg.visible = false;
+            ascaris.userData.larvaBody.visible = true;
+            ascaris.userData.head.visible = true;
+            ascaris.userData.mouth.visible = true;
+            
+            document.querySelector('.stage-indicator').innerHTML = 
+                '<span class="stage-badge">LARVA STAGE</span> - Migrating to lungs';
+            
+            // Visual effect
+            createEvolutionEffect(ascaris.position, 0x88ccff);
+        }
+        
+        function evolveToAdult() {
+            ascaris.userData.larvaBody.visible = false;
+            ascaris.userData.adultBody.visible = true;
+            ascaris.scale.set(1.5, 1.5, 1.5);
+            
+            document.querySelector('.stage-indicator').innerHTML = 
+                '<span class="stage-badge">ADULT STAGE</span> - Reproducing';
+            
+            // Visual effect
+            createEvolutionEffect(ascaris.position, 0xff9800);
+        }
+        
+        function createEvolutionEffect(position, color) {
+            const particles = new THREE.Group();
+            for (let i = 0; i < 30; i++) {
+                const geometry = new THREE.SphereGeometry(0.2, 8, 8);
+                const material = new THREE.MeshBasicMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 0.7
+                });
+                const particle = new THREE.Mesh(geometry, material);
+                particle.position.copy(position);
+                particle.userData.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 1.0,
+                    (Math.random() - 0.5) * 1.0,
+                    (Math.random() - 0.5) * 1.0
+                );
+                particle.userData.life = 1.0;
+                particles.add(particle);
+            }
+            scene.add(particles);
+            
+            // Animate and remove
+            const effectAnimate = function() {
+                particles.children.forEach(particle => {
+                    particle.userData.life -= 0.015;
+                    particle.position.x += particle.userData.velocity.x;
+                    particle.position.y += particle.userData.velocity.y;
+                    particle.position.z += particle.userData.velocity.z;
+                    particle.material.opacity = particle.userData.life * 0.7;
+                    particle.scale.setScalar(particle.userData.life * 2);
+                });
+                
+                if (particles.children[0].userData.life <= 0) {
+                    scene.remove(particles);
+                } else {
+                    requestAnimationFrame(effectAnimate);
+                }
+            };
+            effectAnimate();
+        }
+        
+        // Update UI
+        function updateUI() {
+            document.querySelector('.stats-panel .stat-row:nth-child(2) span:nth-child(2)').textContent = 
+                `${Math.round(gameState.health)}%`;
+            document.getElementById('health-fill').style.width = `${gameState.health}%`;
+            
+            document.querySelector('.stats-panel .stat-row:nth-child(4) span:nth-child(2)').textContent = 
+                `${Math.round(gameState.energy)}%`;
+            document.getElementById('energy-fill').style.width = `${gameState.energy}%`;
+            
+            document.querySelector('.stats-panel .stat-row:nth-child(5) span:nth-child(2)').textContent = 
+                `${gameState.size.toFixed(2)}mm`;
+            
+            document.querySelector('.stats-panel .stat-row:nth-child(6) span:nth-child(2)').textContent = 
+                gameState.location;
+            
+            // Update stage badge
+            const stageBadges = document.querySelectorAll('.stage-badge');
+            stageBadges.forEach(badge => {
+                badge.textContent = gameState.stage.toUpperCase();
+                if (gameState.stage === 'adult') badge.style.background = '#FF9800';
+            });
+        }
         
         // Handle window resize
         window.addEventListener('resize', function() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            minimapCanvas.width = 150;
+            minimapCanvas.height = 150;
         });
-        
-        // Lifecycle management
-        let lifecycleStage = 'egg';
-        let stageProgress = 0;
-        const stageDurations = {
-            egg: 30,
-            larva: 45,
-            adult: 60
-        };
         
         // Animation loop
         const clock = new THREE.Clock();
@@ -342,86 +929,100 @@
         function animate(timestamp) {
             requestAnimationFrame(animate);
             
-            const delta = clock.getDelta();
+            const delta = Math.min(0.1, clock.getDelta());
             const elapsedTime = timestamp - lastTimestamp;
             lastTimestamp = timestamp;
             
-            // Update lifecycle
-            stageProgress += delta;
-            const currentStageDuration = stageDurations[lifecycleStage];
-            const progressPercent = Math.min(100, (stageProgress / currentStageDuration) * 100);
-            
-            document.getElementById('progress').style.width = `${progressPercent}%`;
-            
-            // Stage progression
-            if (stageProgress >= currentStageDuration) {
-                stageProgress = 0;
-                
-                if (lifecycleStage === 'egg') {
-                    lifecycleStage = 'larva';
-                    document.querySelector('.stage-indication').textContent = 'Larva Stage';
-                    document.querySelector('.ui-overlay p:nth-child(2)').textContent = 'Current stage: Larva (will mature in 45s)';
-                    
-                    // Grow Ascaris
-                    ascaris.scale.set(1.5, 1.5, 1.5);
-                } else if (lifecycleStage === 'larva') {
-                    lifecycleStage = 'adult';
-                    document.querySelector('.stage-indication').textContent = 'Adult Stage';
-                    document.querySelector('.ui-overlay p:nth-child(2)').textContent = 'Current stage: Adult (reproducing)';
-                    
-                    // Final growth and color change
-                    ascaris.scale.set(2, 2, 2);
-                    ascaris.children.forEach(child => {
-                        if (child.material && child.material.color) {
-                            child.material.color.setHSL(0.1, 0.7, 0.5);
-                        }
-                    });
-                }
-            }
+            // Update game state
+            updateLifecycle(delta);
             
             // Camera movement
             if (controls.isLocked === true) {
+                // Calculate movement speed
+                let moveSpeed = 5.0;
+                if (accelerate) moveSpeed *= 2.0;
+                if (conserveEnergy) moveSpeed *= 0.7;
+                
                 velocity.x -= velocity.x * 10.0 * delta;
                 velocity.z -= velocity.z * 10.0 * delta;
-                velocity.y -= 9.8 * 5.0 * delta; // gravity
+                velocity.y -= velocity.y * 10.0 * delta;
                 
                 direction.z = Number(moveForward) - Number(moveBackward);
                 direction.x = Number(moveRight) - Number(moveLeft);
-                direction.normalize();
+                direction.y = Number(moveUp) - Number(moveDown);
                 
-                if (moveForward || moveBackward) velocity.z -= direction.z * 40.0 * delta;
-                if (moveLeft || moveRight) velocity.x -= direction.x * 40.0 * delta;
+                if (direction.length() > 0) {
+                    direction.normalize();
+                    velocity.x -= direction.x * moveSpeed * delta;
+                    velocity.z -= direction.z * moveSpeed * delta;
+                    velocity.y -= direction.y * moveSpeed * delta;
+                }
                 
                 controls.moveRight(-velocity.x * delta);
                 controls.moveForward(-velocity.z * delta);
                 controls.getObject().position.y += velocity.y * delta;
                 
-                // Keep within intestinal boundaries
+                // Boundary checking
                 const pos = controls.getObject().position;
-                if (pos.y > 3) {
-                    velocity.y = -Math.abs(velocity.y);
-                    pos.y = 3;
+                if (Math.abs(pos.x) > 20) {
+                    pos.x = pos.x > 0 ? 20 : -20;
+                    velocity.x = -velocity.x * 0.5;
                 }
-                if (pos.y < -3) {
-                    velocity.y = Math.abs(velocity.y);
-                    pos.y = -3;
+                if (Math.abs(pos.y) > 15) {
+                    pos.y = pos.y > 0 ? 15 : -15;
+                    velocity.y = -velocity.y * 0.5;
+                }
+                if (pos.z > 10) {
+                    pos.z = 10;
+                    velocity.z = -velocity.z * 0.5;
                 }
             }
             
-            // Animate Ascaris movement
+            // Update Ascaris position and animation
             ascaris.position.copy(controls.getObject().position);
-            ascaris.position.y += 0.5; // Offset to center in intestine
+            if (gameState.stage === 'larva' || gameState.stage === 'adult') {
+                ascaris.animate(timestamp * 0.001, gameState.stage);
+            }
             
-            // Animate body undulation
-            ascaris.animate(timestamp * 0.001);
+            // Animate immune cells
+            immuneCells.children.forEach(cell => {
+                cell.position.x += cell.userData.velocity.x;
+                cell.position.y += cell.userData.velocity.y;
+                cell.position.z += cell.userData.velocity.z;
+                
+                // Random movement changes
+                if (Math.random() < 0.02) {
+                    cell.userData.velocity.x += (Math.random() - 0.5) * 0.2;
+                    cell.userData.velocity.y += (Math.random() - 0.5) * 0.2;
+                    cell.userData.velocity.z += (Math.random() - 0.5) * 0.2;
+                }
+                
+                // Boundary checking
+                if (Math.abs(cell.position.x) > 25) cell.userData.velocity.x *= -1;
+                if (Math.abs(cell.position.y) > 20) cell.userData.velocity.y *= -1;
+                if (cell.position.z > 0 || cell.position.z < -350) cell.userData.velocity.z *= -1;
+                
+                // Constrain velocity
+                cell.userData.velocity.clampLength(0.1, 0.5);
+            });
             
-            // Subtle intestinal movement
-            intestine.rotation.y += 0.0005;
-            intestine.rotation.x += 0.0003;
+            // Animate nutrients
+            nutrients.children.forEach(nutrient => {
+                nutrient.userData.pulseTime += delta * 2;
+                nutrient.scale.setScalar(1 + Math.sin(nutrient.userData.pulseTime) * 0.2);
+                nutrient.material.emissiveIntensity = 0.5 + Math.sin(nutrient.userData.pulseTime * 3) * 0.5;
+            });
             
-            // Breathing light effect
+            // Update bio light
             const time = Date.now() * 0.001;
-            intestinalLight.intensity = 0.7 + Math.sin(time * 0.5) * 0.3;
+            bioLight.intensity = 1.0 + Math.sin(time * 0.5) * 0.3;
+            bioLight.position.copy(ascaris.position);
+            
+            // Update minimap
+            updateMinimap();
+            
+            // Update UI
+            updateUI();
             
             renderer.render(scene, camera);
         }
@@ -430,4 +1031,4 @@
         animate(0);
     </script>
 </body>
-</html>
+    </html>
