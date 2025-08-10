@@ -1,190 +1,1350 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Бесконечный Процедурный Мир</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: #111;
-      font-family: sans-serif;
-      color: white;
-    }
-    canvas {
-      display: block;
-    }
-    #ui {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: rgba(0,0,0,0.5);
-      padding: 10px;
-      border-radius: 5px;
-      user-select: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Фото-реалистичный 3D симулятор молний</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            touch-action: none;
+            user-select: none;
+        }
+        
+        body {
+            overflow: hidden;
+            background: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+        
+        #container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+            color: white;
+        }
+        
+        #hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 195, 255, 0.3);
+        }
+        
+        .hud-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #4fc3f7;
+            text-shadow: 0 0 10px rgba(79, 195, 247, 0.7);
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: #4fc3f7;
+        }
+        
+        .bar-container {
+            width: 200px;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 6px;
+            margin: 5px 0;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+        
+        #charge-bar .bar-fill {
+            background: linear-gradient(90deg, #00e5ff, #00b0ff);
+            box-shadow: 0 0 10px rgba(0, 195, 255, 0.7);
+        }
+        
+        #energy-bar .bar-fill {
+            background: linear-gradient(90deg, #ff4081, #f50057);
+            box-shadow: 0 0 10px rgba(255, 64, 129, 0.7);
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 30px;
+            pointer-events: none;
+        }
+        
+        .joystick-base {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 195, 255, 0.2);
+        }
+        
+        .joystick-thumb {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, rgba(79, 195, 247, 0.9) 0%, rgba(0, 176, 255, 0.7) 100%);
+            border-radius: 50%;
+            touch-action: none;
+            box-shadow: 0 0 15px rgba(0, 195, 255, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        #action-button {
+            width: 90px;
+            height: 90px;
+            background: radial-gradient(circle, #ff4081 30%, #c51162 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            pointer-events: auto;
+            box-shadow: 0 0 25px rgba(255, 64, 129, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+        
+        #menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(13, 19, 66, 0.9) 0%, rgba(3, 6, 25, 0.95) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            backdrop-filter: blur(5px);
+        }
+        
+        .menu-title {
+            font-size: 48px;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #4fc3f7, #00e5ff, #e1bee7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(79, 195, 247, 0.5);
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+        
+        .menu-subtitle {
+            font-size: 20px;
+            margin-bottom: 40px;
+            color: #bbdefb;
+            text-align: center;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+        
+        .menu-button {
+            background: linear-gradient(45deg, #00b0ff, #00e5ff);
+            border: none;
+            color: white;
+            padding: 18px 45px;
+            margin: 15px;
+            font-size: 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            pointer-events: auto;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 25px rgba(0, 176, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .menu-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 176, 255, 0.6);
+        }
+        
+        .menu-button:active {
+            transform: translateY(1px);
+        }
+        
+        #game-over {
+            display: none;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .instructions {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+            max-width: 80%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .instructions h3 {
+            color: #4fc3f7;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .instructions ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .instructions li {
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #e3f2fd;
+        }
+        
+        .instructions li:before {
+            content: "⚡";
+            position: absolute;
+            left: 0;
+            color: #ff4081;
+        }
+        
+        #fps-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #4fc3f7;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .particle-counter {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #ff4081;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        #loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+            color: white;
+        }
+        
+        .loader {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(255, 255, 255, 0.1);
+            border-top: 8px solid #00e5ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #time-display {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            color: #4fc3f7;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        #weather-display {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            color: #ff9800;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
 </head>
 <body>
-  <canvas id="world"></canvas>
-  <div id="ui">
-    Бесконечный Процедурный Мир<br>
-    Перетаскивайте правой кнопкой мыши
-  </div>
+    <div id="container"></div>
+    
+    <div id="ui">
+        <div id="time-display">Ночь, Гроза</div>
+        <div id="weather-display">Интенсивность: Сильная</div>
+        <div id="hud">
+            <div class="hud-title">ПАРАМЕТРЫ ГРОЗЫ</div>
+            <div class="stat-row">
+                <span>Интенсивность:</span>
+                <span class="stat-value" id="intensity-value">75%</span>
+            </div>
+            <div class="bar-container" id="intensity-bar">
+                <div class="bar-fill" style="width: 75%"></div>
+            </div>
+            <div class="stat-row">
+                <span>Энергия облаков:</span>
+                <span class="stat-value" id="energy-value">100%</span>
+            </div>
+            <div class="bar-container" id="energy-bar">
+                <div class="bar-fill" style="width: 100%"></div>
+            </div>
+            <div class="stat-row">
+                <span>Молний за сессию:</span>
+                <span class="stat-value" id="lightning-count">0</span>
+            </div>
+            <div class="stat-row">
+                <span>Счет:</span>
+                <span class="stat-value" id="score">0</span>
+            </div>
+        </div>
+        
+        <div id="fps-counter">FPS: 60</div>
+        <div class="particle-counter">Частицы: 0</div>
+        
+        <div id="controls">
+            <div class="joystick-base" id="joystick">
+                <div class="joystick-thumb"></div>
+            </div>
+            <div id="action-button">⚡</div>
+        </div>
+    </div>
+    
+    <div id="menu">
+        <h1 class="menu-title">ФОТО-РЕАЛИСТИЧНЫЙ 3D СИМУЛЯТОР МОЛНИЙ</h1>
+        <p class="menu-subtitle">Наблюдайте за мощью природы сверху! Молнии генерируются из облаков с фотореалистичной графикой</p>
+        
+        <button class="menu-button" id="start-button">НАЧАТЬ СИМУЛЯЦИЮ</button>
+        
+        <div class="instructions">
+            <h3>УПРАВЛЕНИЕ</h3>
+            <ul>
+                <li>Джойстик - перемещение камеры</li>
+                <li>Кнопка ⚡ - создать молнию в точке</li>
+                <li>Наблюдайте за реалистичными разрядами</li>
+                <li>Управляйте интенсивностью грозы</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div id="game-over" class="hidden">
+        <h1 class="menu-title">СИМУЛЯЦИЯ ЗАВЕРШЕНА</h1>
+        <p class="menu-subtitle">Гроза стихла</p>
+        <div style="font-size: 24px; margin: 20px 0; color: #4fc3f7;">
+            Молний создано: <span id="final-lightning" style="font-weight: bold; color: #ff4081;">0</span>
+        </div>
+        <div style="font-size: 24px; margin: 20px 0; color: #4fc3f7;">
+            Финальный счет: <span id="final-score" style="font-weight: bold; color: #ff4081;">0</span>
+        </div>
+        <button class="menu-button" id="restart-button">ПОВТОРИТЬ СИМУЛЯЦИЮ</button>
+    </div>
+    
+    <div id="loading">
+        <div class="loader"></div>
+        <h2>Загрузка 3D-среды...</h2>
+        <p>Инициализация фотореалистичной графики</p>
+    </div>
 
-  <!-- Подключаем SimplexNoise (упрощённая реализация) -->
-  <script type="module">
-    import SimplexNoise from 'https://cdn.skypack.dev/simplex-noise@4.0.0';
-
-    // Настройки
-    const TILE_SIZE = 20;
-    const CHUNK_SIZE = 32;
-    const CANVAS_WIDTH = window.innerWidth;
-    const CANVAS_HEIGHT = window.innerHeight;
-    const canvas = document.getElementById('world');
-    const ctx = canvas.getContext('2d');
-
-    canvas.width = CANVAS_WIDTH;
-    canvas.height = CANVAS_HEIGHT;
-
-    let offsetX = 0, offsetY = 0;
-    let isDragging = false;
-    let lastX, lastY;
-
-    // Инициализация шума
-    const simplex = new SimplexNoise();
-
-    // Функция для получения шума в точке (x, y) с масштабом
-    function getNoise(x, y, scale = 0.01, octaves = 4) {
-      let total = 0;
-      let frequency, amplitude, maxValue = 0;
-
-      for (let i = 0; i < octaves; i++) {
-        frequency = Math.pow(2, i) * scale;
-        amplitude = 1 / Math.pow(1.5, i);
-        total += simplex.noise2D(x * frequency, y * frequency) * amplitude;
-        maxValue += amplitude;
-      }
-
-      return total / maxValue; // нормализуем в [-1, 1]
-    }
-
-    // Цвет по высоте
-    function getColor(elevation, moisture) {
-      if (elevation < -0.2) return '#001f5b'; // глубокая вода
-      if (elevation < 0) return '#0044aa'; // мелкая вода
-      if (elevation < 0.2) {
-        if (moisture > 0.5) return '#3d7a3d'; // лес
-        return '#c2b280'; // пляж
-      }
-      if (elevation < 0.4) {
-        if (moisture > 0.6) return '#2e6e2e';
-        return '#8fbc8f'; // зелёные поля
-      }
-      if (elevation < 0.6) return '#8b4513'; // горы
-      if (elevation < 0.8) return '#a9a9a9'; // скалы
-      return '#ffffff'; // снег
-    }
-
-    // Отрисовка чанка
-    function drawChunk(startX, startY, width, height) {
-      const imageData = ctx.createImageData(width, height);
-      const data = imageData.data;
-
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-          const worldX = startX + x + offsetX;
-          const worldY = startY + y + offsetY;
-
-          const elevation = getNoise(worldX, worldY, 0.008, 5);
-          const moisture = getNoise(worldX + 1000, worldY + 1000, 0.012, 3);
-
-          const color = getColor(elevation, moisture);
-          const rgb = hexToRgb(color);
-
-          const idx = (y * width + x) * 4;
-          data[idx] = rgb.r;
-          data[idx + 1] = rgb.g;
-          data[idx + 2] = rgb.b;
-          data[idx + 3] = 255;
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        class PhotoRealisticLightningSimulator {
+            constructor() {
+                this.container = document.getElementById('container');
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.clouds = [];
+                this.lightningBolts = [];
+                this.terrain = null;
+                this.groundObjects = [];
+                this.postProcessing = null;
+                
+                // Игровые состояния
+                this.gameState = 'menu'; // menu, playing, gameOver, loading
+                this.score = 0;
+                this.lightningCount = 0;
+                this.keys = {};
+                this.joystick = { active: false, x: 0, y: 0 };
+                this.lastTime = 0;
+                this.frameCount = 0;
+                this.fps = 60;
+                this.lastFpsUpdate = 0;
+                this.timeOfDay = 0; // 0-1 (0 = ночь, 0.5 = день, 1 = ночь)
+                
+                // Настройки симуляции
+                this.settings = {
+                    lightningFrequency: 0.03, // Вероятность молнии за кадр
+                    cloudCount: 20,
+                    groundSize: 2000,
+                    cloudHeight: 200,
+                    intensity: 75,
+                    energy: 100,
+                    weatherIntensity: 0.8 // 0-1
+                };
+                
+                this.setupEventListeners();
+                this.init();
+            }
+            
+            init() {
+                // Инициализация Three.js
+                this.scene = new THREE.Scene();
+                this.scene.fog = new THREE.Fog(0x0c1445, 300, 2000);
+                
+                // Камера (вид сверху)
+                this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 5000);
+                this.camera.position.set(0, 600, 0);
+                this.camera.lookAt(0, 0, 0);
+                this.camera.up.set(0, 0, -1);
+                
+                // Рендерер
+                this.renderer = new THREE.WebGLRenderer({ 
+                    antialias: true,
+                    powerPreference: "high-performance"
+                });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(window.devicePixelRatio);
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                this.renderer.toneMappingExposure = 1.5;
+                this.renderer physicallyCorrectLights = true;
+                this.container.appendChild(this.renderer.domElement);
+                
+                // Освещение
+                this.setupLighting();
+                
+                // Создание ландшафта
+                this.createTerrain();
+                
+                // Создание облаков
+                this.createClouds();
+                
+                // Создание объектов на земле
+                this.createGroundObjects();
+                
+                // Создание частиц дождя
+                this.createRain();
+                
+                // Создание атмосферы
+                this.createAtmosphere();
+                
+                // Обработчики событий
+                window.addEventListener('resize', () => this.onWindowResize());
+                this.setupControls();
+                
+                // Скрыть загрузку
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                }, 3000);
+                
+                // Запуск цикла рендеринга
+                this.animate();
+            }
+            
+            setupLighting() {
+                // Основное освещение (лунный свет)
+                const ambientLight = new THREE.AmbientLight(0x202040, 0.2);
+                this.scene.add(ambientLight);
+                
+                // Направленный свет (лунный свет)
+                const moonLight = new THREE.DirectionalLight(0x88aaff, 0.4);
+                moonLight.position.set(500, 600, 300);
+                moonLight.castShadow = true;
+                moonLight.shadow.mapSize.width = 4096;
+                moonLight.shadow.mapSize.height = 4096;
+                moonLight.shadow.camera.near = 100;
+                moonLight.shadow.camera.far = 2000;
+                moonLight.shadow.camera.left = -800;
+                moonLight.shadow.camera.right = 800;
+                moonLight.shadow.camera.top = 800;
+                moonLight.shadow.camera.bottom = -800;
+                this.scene.add(moonLight);
+                
+                // Точечный свет для молнии
+                this.lightningLight = new THREE.PointLight(0xffffff, 3, 800);
+                this.lightningLight.position.set(0, 300, 0);
+                this.lightningLight.castShadow = true;
+                this.lightningLight.shadow.mapSize.width = 2048;
+                this.lightningLight.shadow.mapSize.height = 2048;
+                this.scene.add(this.lightningLight);
+                this.lightningLight.visible = false;
+                
+                // Атмосферное освещение
+                const hemisphereLight = new THREE.HemisphereLight(0x4488ff, 0x224422, 0.1);
+                this.scene.add(hemisphereLight);
+            }
+            
+            createTerrain() {
+                // Создание ландшафта с более детализированной геометрией
+                const geometry = new THREE.PlaneGeometry(this.settings.groundSize, this.settings.groundSize, 256, 256);
+                const vertices = geometry.attributes.position.array;
+                
+                // Генерация высот с более сложным шумом
+                for (let i = 0; i <= 256; i++) {
+                    for (let j = 0; j <= 256; j++) {
+                        const idx = (i * 257 + j) * 3;
+                        const x = vertices[idx];
+                        const z = vertices[idx + 1];
+                        
+                        // Комбинированный шум для реалистичных высот
+                        const height = 
+                            Math.sin(x * 0.005) * Math.cos(z * 0.005) * 30 +
+                            Math.sin(x * 0.015) * Math.cos(z * 0.015) * 15 +
+                            Math.sin(x * 0.04) * Math.cos(z * 0.04) * 8 +
+                            Math.sin(x * 0.1) * Math.cos(z * 0.1) * 3;
+                        
+                        vertices[idx + 2] = height;
+                    }
+                }
+                
+                geometry.computeVertexNormals();
+                
+                // Создание многослойного материала для ландшафта
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0x3d5a80,
+                    roughness: 0.85,
+                    metalness: 0.05,
+                    wireframe: false
+                });
+                
+                this.terrain = new THREE.Mesh(geometry, material);
+                this.terrain.rotation.x = -Math.PI / 2;
+                this.terrain.position.y = -50;
+                this.terrain.receiveShadow = true;
+                this.scene.add(this.terrain);
+                
+                // Создание воды с реалистичными отражениями
+                const waterGeometry = new THREE.PlaneGeometry(this.settings.groundSize, this.settings.groundSize, 64, 64);
+                const waterVertices = waterGeometry.attributes.position.array;
+                
+                // Создание волн
+                for (let i = 0; i <= 64; i++) {
+                    for (let j = 0; j <= 64; j++) {
+                        const idx = (i * 65 + j) * 3;
+                        const x = waterVertices[idx];
+                        const z = waterVertices[idx + 1];
+                        
+                        // Анимация волн
+                        const wave = 
+                            Math.sin(x * 0.02 + Date.now() * 0.001) * Math.cos(z * 0.02) * 1 +
+                            Math.sin(x * 0.05) * Math.cos(z * 0.05 + Date.now() * 0.0005) * 0.5;
+                        
+                        waterVertices[idx + 2] = wave;
+                    }
+                }
+                
+                waterGeometry.computeVertexNormals();
+                
+                const waterMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x1e88e5,
+                    transparent: true,
+                    opacity: 0.85,
+                    roughness: 0.05,
+                    metalness: 0.95,
+                    side: THREE.DoubleSide
+                });
+                
+                const water = new THREE.Mesh(waterGeometry, waterMaterial);
+                water.rotation.x = -Math.PI / 2;
+                water.position.y = -49;
+                water.receiveShadow = true;
+                this.scene.add(water);
+                
+                // Сохраняем ссылку на воду для анимации
+                this.water = water;
+            }
+            
+            createClouds() {
+                // Создание реалистичных объемных облаков
+                for (let i = 0; i < this.settings.cloudCount; i++) {
+                    const size = 100 + Math.random() * 100;
+                    const height = this.settings.cloudHeight + Math.random() * 80;
+                    const x = (Math.random() - 0.5) * this.settings.groundSize * 0.9;
+                    const z = (Math.random() - 0.5) * this.settings.groundSize * 0.9;
+                    
+                    // Создание объемных облаков из нескольких сфер
+                    const cloudGroup = new THREE.Group();
+                    
+                    // Основная масса облака
+                    const mainGeometry = new THREE.SphereGeometry(size, 24, 24);
+                    const mainMaterial = new THREE.MeshStandardMaterial({
+                        color: 0xf0f0f0,
+                        transparent: true,
+                        opacity: 0.85,
+                        roughness: 0.95,
+                        metalness: 0.0
+                    });
+                    
+                    const mainCloud = new THREE.Mesh(mainGeometry, mainMaterial);
+                    mainCloud.castShadow = true;
+                    cloudGroup.add(mainCloud);
+                    
+                    // Дополнительные "куски" облака
+                    for (let j = 0; j < 5; j++) {
+                        const pieceSize = size * (0.3 + Math.random() * 0.4);
+                        const offsetX = (Math.random() - 0.5) * size * 1.2;
+                        const offsetY = (Math.random() - 0.5) * size * 0.5;
+                        const offsetZ = (Math.random() - 0.5) * size * 1.2;
+                        
+                        const pieceGeometry = new THREE.SphereGeometry(pieceSize, 16, 16);
+                        const pieceMaterial = new THREE.MeshStandardMaterial({
+                            color: 0xf8f8f8,
+                            transparent: true,
+                            opacity: 0.8,
+                            roughness: 0.9,
+                            metalness: 0.0
+                        });
+                        
+                        const piece = new THREE.Mesh(pieceGeometry, pieceMaterial);
+                        piece.position.set(offsetX, offsetY, offsetZ);
+                        piece.castShadow = true;
+                        cloudGroup.add(piece);
+                    }
+                    
+                    cloudGroup.position.set(x, height, z);
+                    this.scene.add(cloudGroup);
+                    this.clouds.push(cloudGroup);
+                }
+            }
+            
+            createGroundObjects() {
+                // Создание реалистичных деревьев
+                for (let i = 0; i < 120; i++) {
+                    const x = (Math.random() - 0.5) * this.settings.groundSize * 0.95;
+                    const z = (Math.random() - 0.5) * this.settings.groundSize * 0.95;
+                    const height = this.getHeightAt(x, z);
+                    
+                    // Создание дерева как группы объектов
+                    const tree = new THREE.Group();
+                    
+                    // Ствол
+                    const trunkHeight = 20 + Math.random() * 15;
+                    const trunkGeometry = new THREE.CylinderGeometry(1.2, 1.8, trunkHeight, 12);
+                    const trunkMaterial = new THREE.MeshStandardMaterial({ 
+                        color: 0x5d4037,
+                        roughness: 0.9,
+                        metalness: 0.1
+                    });
+                    const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+                    trunk.position.y = trunkHeight/2;
+                    trunk.castShadow = true;
+                    trunk.receiveShadow = true;
+                    tree.add(trunk);
+                    
+                    // Крона (несколько сфер для реалистичности)
+                    const crownBaseSize = 12 + Math.random() * 8;
+                    const crownHeight = 15 + Math.random() * 10;
+                    
+                    for (let j = 0; j < 4; j++) {
+                        const crownSize = crownBaseSize * (0.7 + Math.random() * 0.4);
+                        const crownY = trunkHeight + crownHeight * (0.3 + j * 0.2);
+                        const offsetX = (Math.random() - 0.5) * 3;
+                        const offsetZ = (Math.random() - 0.5) * 3;
+                        
+                        const crownGeometry = new THREE.SphereGeometry(crownSize, 16, 16);
+                        const crownMaterial = new THREE.MeshStandardMaterial({ 
+                            color: 0x2e7d32,
+                            roughness: 0.95,
+                            metalness: 0.05
+                        });
+                        
+                        const crown = new THREE.Mesh(crownGeometry, crownMaterial);
+                        crown.position.set(offsetX, crownY, offsetZ);
+                        crown.castShadow = true;
+                        crown.receiveShadow = true;
+                        tree.add(crown);
+                    }
+                    
+                    tree.position.set(x, height, z);
+                    this.scene.add(tree);
+                    this.groundObjects.push(tree);
+                }
+                
+                // Создание зданий
+                for (let i = 0; i < 30; i++) {
+                    const x = (Math.random() - 0.5) * this.settings.groundSize * 0.8;
+                    const z = (Math.random() - 0.5) * this.settings.groundSize * 0.8;
+                    const height = this.getHeightAt(x, z);
+                    const size = 20 + Math.random() * 25;
+                    const buildingHeight = 30 + Math.random() * 60;
+                    
+                    // Создание здания как группы
+                    const building = new THREE.Group();
+                    
+                    // Основное здание
+                    const geometry = new THREE.BoxGeometry(size, buildingHeight, size);
+                    const material = new THREE.MeshStandardMaterial({ 
+                        color: 0x616161,
+                        roughness: 0.7,
+                        metalness: 0.3
+                    });
+                    
+                    const mainBuilding = new THREE.Mesh(geometry, material);
+                    mainBuilding.position.y = buildingHeight/2;
+                    mainBuilding.castShadow = true;
+                    mainBuilding.receiveShadow = true;
+                    building.add(mainBuilding);
+                    
+                    // Крыша
+                    const roofHeight = 8;
+                    const roofGeometry = new THREE.ConeGeometry(size * 0.8, roofHeight, 4);
+                    const roofMaterial = new THREE.MeshStandardMaterial({ 
+                        color: 0x8d6e63,
+                        roughness: 0.8,
+                        metalness: 0.2
+                    });
+                    
+                    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+                    roof.position.y = buildingHeight + roofHeight/2;
+                    roof.castShadow = true;
+                    building.add(roof);
+                    
+                    building.position.set(x, height, z);
+                    this.scene.add(building);
+                    this.groundObjects.push(building);
+                }
+                
+                // Создание металлических объектов (молниеотводы)
+                for (let i = 0; i < 40; i++) {
+                    const x = (Math.random() - 0.5) * this.settings.groundSize * 0.95;
+                    const z = (Math.random() - 0.5) * this.settings.groundSize * 0.95;
+                    const height = this.getHeightAt(x, z);
+                    
+                    // Создание молниеотвода
+                    const lightningRod = new THREE.Group();
+                    
+                    // Основание
+                    const baseGeometry = new THREE.CylinderGeometry(2, 2.5, 1, 16);
+                    const baseMaterial = new THREE.MeshStandardMaterial({
+                        color: 0x757575,
+                        roughness: 0.6,
+                        metalness: 0.7
+                    });
+                    const base = new THREE.Mesh(baseGeometry, baseMaterial);
+                    base.position.y = 0.5;
+                    base.castShadow = true;
+                    base.receiveShadow = true;
+                    lightningRod.add(base);
+                    
+                    // Стержень
+                    const rodGeometry = new THREE.CylinderGeometry(0.3, 0.3, 35, 8);
+                    const rodMaterial = new THREE.MeshStandardMaterial({
+                        color: 0xe0e0e0,
+                        roughness: 0.2,
+                        metalness: 0.9
+                    });
+                    const rod = new THREE.Mesh(rodGeometry, rodMaterial);
+                    rod.position.y = 18;
+                    rod.castShadow = true;
+                    lightningRod.add(rod);
+                    
+                    // Верхушка
+                    const tipGeometry = new THREE.ConeGeometry(0.8, 3, 8);
+                    const tipMaterial = new THREE.MeshStandardMaterial({
+                        color: 0xffd600,
+                        roughness: 0.3,
+                        metalness: 0.95
+                    });
+                    const tip = new THREE.Mesh(tipGeometry, tipMaterial);
+                    tip.position.y = 36;
+                    tip.castShadow = true;
+                    lightningRod.add(tip);
+                    
+                    lightningRod.position.set(x, height, z);
+                    this.scene.add(lightningRod);
+                    this.groundObjects.push(lightningRod);
+                }
+            }
+            
+            createRain() {
+                // Создание системы частиц для дождя
+                const rainCount = 15000;
+                const rainGeometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(rainCount * 3);
+                const velocities = new Float32Array(rainCount * 3);
+                
+                for (let i = 0; i < rainCount; i++) {
+                    const i3 = i * 3;
+                    positions[i3] = (Math.random() - 0.5) * this.settings.groundSize * 1.2;
+                    positions[i3 + 1] = Math.random() * 500 + 200;
+                    positions[i3 + 2] = (Math.random() - 0.5) * this.settings.groundSize * 1.2;
+                    
+                    velocities[i3] = (Math.random() - 0.5) * 3;
+                    velocities[i3 + 1] = -30 - Math.random() * 20;
+                    velocities[i3 + 2] = (Math.random() - 0.5) * 3;
+                }
+                
+                rainGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                rainGeometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
+                
+                const rainMaterial = new THREE.PointsMaterial({
+                    color: 0xaaaaaa,
+                    size: 0.8,
+                    transparent: true,
+                    opacity: 0.7
+                });
+                
+                this.rainSystem = new THREE.Points(rainGeometry, rainMaterial);
+                this.scene.add(this.rainSystem);
+            }
+            
+            createAtmosphere() {
+                // Создание атмосферных эффектов
+                const atmosphereGeometry = new THREE.SphereGeometry(1500, 32, 32);
+                const atmosphereMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x1a237e,
+                    transparent: true,
+                    opacity: 0.05,
+                    side: THREE.BackSide
+                });
+                
+                const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+                atmosphere.position.y = 200;
+                this.scene.add(atmosphere);
+                
+                // Создание звезд
+                const starGeometry = new THREE.BufferGeometry();
+                const starPositions = new Float32Array(2000 * 3);
+                
+                for (let i = 0; i < 2000; i++) {
+                    const i3 = i * 3;
+                    const radius = 1400;
+                    const theta = Math.random() * Math.PI * 2;
+                    const phi = Math.acos(2 * Math.random() - 1);
+                    
+                    starPositions[i3] = radius * Math.sin(phi) * Math.cos(theta);
+                    starPositions[i3 + 1] = radius * Math.cos(phi);
+                    starPositions[i3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+                }
+                
+                starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+                
+                const starMaterial = new THREE.PointsMaterial({
+                    color: 0xffffff,
+                    size: 1.5,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                
+                const stars = new THREE.Points(starGeometry, starMaterial);
+                this.scene.add(stars);
+            }
+            
+            getHeightAt(x, z) {
+                // Простая функция для получения высоты ландшафта
+                return Math.sin(x * 0.005) * Math.cos(z * 0.005) * 30 +
+                       Math.sin(x * 0.015) * Math.cos(z * 0.015) * 15 +
+                       Math.sin(x * 0.04) * Math.cos(z * 0.04) * 8 +
+                       Math.sin(x * 0.1) * Math.cos(z * 0.1) * 3 - 50;
+            }
+            
+            setupEventListeners() {
+                // Кнопки меню
+                document.getElementById('start-button').addEventListener('click', () => {
+                    this.startGame();
+                });
+                
+                document.getElementById('restart-button').addEventListener('click', () => {
+                    this.startGame();
+                });
+                
+                // Управление
+                window.addEventListener('keydown', (e) => this.keys[e.code] = true);
+                window.addEventListener('keyup', (e) => this.keys[e.code] = false);
+            }
+            
+            setupControls() {
+                const joystick = document.getElementById('joystick');
+                const thumb = joystick.querySelector('.joystick-thumb');
+                const actionButton = document.getElementById('action-button');
+                
+                let joystickActive = false;
+                let startX, startY;
+                
+                joystick.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    startX = touch.clientX;
+                    startY = touch.clientY;
+                    joystickActive = true;
+                });
+                
+                joystick.addEventListener('touchmove', (e) => {
+                    if (!joystickActive) return;
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    const deltaX = touch.clientX - startX;
+                    const deltaY = touch.clientY - startY;
+                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                    const maxDistance = 40;
+                    
+                    if (distance > maxDistance) {
+                        const angle = Math.atan2(deltaY, deltaX);
+                        this.joystick.x = Math.cos(angle);
+                        this.joystick.y = Math.sin(angle);
+                    } else {
+                        this.joystick.x = deltaX / maxDistance;
+                        this.joystick.y = deltaY / maxDistance;
+                    }
+                    
+                    thumb.style.transform = `translate(${this.joystick.x * 30}px, ${this.joystick.y * 30}px)`;
+                });
+                
+                joystick.addEventListener('touchend', () => {
+                    joystickActive = false;
+                    this.joystick.x = 0;
+                    this.joystick.y = 0;
+                    thumb.style.transform = 'translate(0px, 0px)';
+                });
+                
+                actionButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.createLightningAtPoint();
+                });
+                
+                // Мышиное управление для тестирования
+                actionButton.addEventListener('mousedown', () => this.createLightningAtPoint());
+            }
+            
+            startGame() {
+                this.gameState = 'playing';
+                document.getElementById('menu').classList.add('hidden');
+                document.getElementById('game-over').classList.add('hidden');
+                
+                // Сброс состояния
+                this.score = 0;
+                this.lightningCount = 0;
+                this.settings.intensity = 75;
+                this.settings.energy = 100;
+                
+                // Обновление UI
+                document.getElementById('intensity-value').textContent = this.settings.intensity + '%';
+                document.getElementById('energy-value').textContent = this.settings.energy + '%';
+                document.getElementById('lightning-count').textContent = this.lightningCount;
+                document.getElementById('score').textContent = this.score;
+                
+                document.getElementById('intensity-bar').querySelector('.bar-fill').style.width = this.settings.intensity + '%';
+                document.getElementById('energy-bar').querySelector('.bar-fill').style.width = this.settings.energy + '%';
+            }
+            
+            createLightningAtPoint() {
+                if (this.gameState !== 'playing') return;
+                
+                // Создаем молнию в случайной точке под облаком
+                const cloudIndex = Math.floor(Math.random() * this.clouds.length);
+                const cloud = this.clouds[cloudIndex];
+                
+                // Определяем точку на земле под облаком
+                const groundX = cloud.position.x + (Math.random() - 0.5) * 80;
+                const groundZ = cloud.position.z + (Math.random() - 0.5) * 80;
+                const groundY = this.getHeightAt(groundX, groundZ);
+                
+                // Создаем молнию
+                this.createLightningBolt(
+                    cloud.position.x, 
+                    cloud.position.y, 
+                    groundX, 
+                    groundY, 
+                    groundZ
+                );
+                
+                // Увеличиваем счет
+                this.lightningCount++;
+                this.score += 150;
+                
+                // Обновляем UI
+                document.getElementById('lightning-count').textContent = this.lightningCount;
+                document.getElementById('score').textContent = this.score;
+            }
+            
+            createLightningBolt(startX, startY, endX, endY, endZ) {
+                // Создаем основной разряд с реалистичными ветвлениями
+                const mainBolt = this.createBoltSegment(startX, startY, endX, endY, endZ, 0);
+                this.scene.add(mainBolt);
+                this.lightningBolts.push(mainBolt);
+                
+                // Создаем ветвления
+                const branchCount = 3 + Math.floor(Math.random() * 4);
+                for (let i = 0; i < branchCount; i++) {
+                    const t = 0.2 + Math.random() * 0.6; // Позиция ветвления
+                    const branchStartX = startX + (endX - startX) * t;
+                    const branchStartY = startY + (endY - startY) * t;
+                    const branchStartZ = 0; // Упрощение для 2D вида
+                    
+                    // Направление ветвления
+                    const angle = Math.random() * Math.PI * 2;
+                    const branchLength = 30 + Math.random() * 50;
+                    const branchEndX = branchStartX + Math.cos(angle) * branchLength;
+                    const branchEndY = branchStartY + Math.sin(angle) * branchLength * 0.5;
+                    const branchEndZ = branchStartZ + Math.sin(angle) * branchLength * 0.3;
+                    
+                    const branchBolt = this.createBoltSegment(
+                        branchStartX, branchStartY, branchEndX, branchEndY, branchEndZ, 1
+                    );
+                    this.scene.add(branchBolt);
+                    this.lightningBolts.push(branchBolt);
+                }
+                
+                // Создаем световой эффект
+                this.lightningLight.position.set(endX, endY + 100, 0);
+                this.lightningLight.visible = true;
+                this.lightningLight.intensity = 8;
+                
+                // Создаем эффект удара
+                this.createImpactEffect(endX, endY, endZ);
+                
+                // Удаляем молнию через короткое время
+                setTimeout(() => {
+                    this.scene.remove(mainBolt);
+                    const index = this.lightningBolts.indexOf(mainBolt);
+                    if (index > -1) {
+                        this.lightningBolts.splice(index, 1);
+                    }
+                    
+                    // Выключаем свет через короткое время
+                    setTimeout(() => {
+                        this.lightningLight.visible = false;
+                    }, 80);
+                }, 150);
+            }
+            
+            createBoltSegment(startX, startY, endX, endY, endZ, level) {
+                // Создаем реалистичный сегмент молнии
+                const segments = 15 + Math.floor(Math.random() * 10);
+                const points = [];
+                
+                // Начальная точка
+                points.push(new THREE.Vector3(startX, startY, 0));
+                
+                // Промежуточные точки с изгибами
+                for (let i = 1; i < segments; i++) {
+                    const t = i / segments;
+                    const x = startX + (endX - startX) * t;
+                    const y = startY + (endY - startY) * t;
+                    const z = (Math.random() - 0.5) * 15; // Изгибы по Z
+                    
+                    // Добавляем случайные отклонения
+                    const deviation = 20 - level * 8;
+                    points.push(new THREE.Vector3(
+                        x + (Math.random() - 0.5) * deviation,
+                        y + (Math.random() - 0.5) * deviation * 0.3,
+                        z
+                    ));
+                }
+                
+                // Конечная точка
+                points.push(new THREE.Vector3(endX, endY, 0));
+                
+                // Создаем линию для молнии
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                
+                // Толщина зависит от уровня ветвления
+                const lineWidth = Math.max(0.5, 3 - level * 1.2);
+                
+                const material = new THREE.LineBasicMaterial({
+                    color: level === 0 ? 0xffffff : 0xaaaaaa,
+                    linewidth: lineWidth
+                });
+                
+                const bolt = new THREE.Line(geometry, material);
+                return bolt;
+            }
+            
+            createImpactEffect(x, y, z) {
+                // Создаем эффект удара на земле
+                const geometry = new THREE.SphereGeometry(8, 16, 16);
+                const material = new THREE.MeshBasicMaterial({
+                    color: 0xffff88,
+                    transparent: true,
+                    opacity: 0.9
+                });
+                
+                const impact = new THREE.Mesh(geometry, material);
+                impact.position.set(x, y + 10, z);
+                this.scene.add(impact);
+                
+                // Анимация исчезновения
+                let scale = 1;
+                const animate = () => {
+                    scale += 0.3;
+                    impact.scale.set(scale, scale, scale);
+                    impact.material.opacity -= 0.07;
+                    
+                    if (impact.material.opacity <= 0) {
+                        this.scene.remove(impact);
+                    } else {
+                        requestAnimationFrame(animate);
+                    }
+                };
+                
+                animate();
+                
+                // Создаем кольцевой эффект
+                const ringGeometry = new THREE.RingGeometry(5, 15, 32);
+                const ringMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x88ccff,
+                    transparent: true,
+                    opacity: 0.7,
+                    side: THREE.DoubleSide
+                });
+                
+                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                ring.position.set(x, y + 2, z);
+                ring.rotation.x = Math.PI / 2;
+                this.scene.add(ring);
+                
+                // Анимация кольца
+                let ringScale = 1;
+                const ringAnimate = () => {
+                    ringScale += 0.2;
+                    ring.scale.set(ringScale, ringScale, ringScale);
+                    ring.material.opacity -= 0.05;
+                    
+                    if (ring.material.opacity <= 0) {
+                        this.scene.remove(ring);
+                    } else {
+                        requestAnimationFrame(ringAnimate);
+                    }
+                };
+                
+                ringAnimate();
+            }
+            
+            update(deltaTime) {
+                if (this.gameState !== 'playing') return;
+                
+                // Управление камерой
+                let moveX = 0;
+                let moveZ = 0;
+                
+                // Клавиатура
+                if (this.keys['KeyA'] || this.keys['ArrowLeft']) moveX = -1;
+                if (this.keys['KeyD'] || this.keys['ArrowRight']) moveX = 1;
+                if (this.keys['KeyW'] || this.keys['ArrowUp']) moveZ = -1;
+                if (this.keys['KeyS'] || this.keys['ArrowDown']) moveZ = 1;
+                
+                // Джойстик
+                if (this.joystick.x !== 0 || this.joystick.y !== 0) {
+                    moveX = this.joystick.x;
+                    moveZ = this.joystick.y;
+                }
+                
+                // Применяем движение камеры
+                const speed = 8;
+                this.camera.position.x += moveX * speed;
+                this.camera.position.z += moveZ * speed;
+                
+                // Ограничиваем движение камеры
+                const limit = this.settings.groundSize / 2 - 200;
+                this.camera.position.x = Math.max(-limit, Math.min(limit, this.camera.position.x));
+                this.camera.position.z = Math.max(-limit, Math.min(limit, this.camera.position.z));
+                
+                // Автоматическое создание молний
+                if (Math.random() < this.settings.lightningFrequency * (this.settings.intensity / 100)) {
+                    this.createLightningAtPoint();
+                }
+                
+                // Обновление дождя
+                if (this.rainSystem) {
+                    const positions = this.rainSystem.geometry.attributes.position.array;
+                    const velocities = this.rainSystem.geometry.attributes.velocity.array;
+                    
+                    for (let i = 0; i < positions.length; i += 3) {
+                        positions[i] += velocities[i] * 0.5;
+                        positions[i + 1] += velocities[i + 1] * 0.5;
+                        positions[i + 2] += velocities[i + 2] * 0.5;
+                        
+                        // Если капля упала на землю, перемещаем её наверх
+                        if (positions[i + 1] < this.getHeightAt(positions[i], positions[i + 2]) - 10) {
+                            positions[i] = (Math.random() - 0.5) * this.settings.groundSize * 1.2;
+                            positions[i + 1] = 500 + Math.random() * 100;
+                            positions[i + 2] = (Math.random() - 0.5) * this.settings.groundSize * 1.2;
+                        }
+                    }
+                    
+                    this.rainSystem.geometry.attributes.position.needsUpdate = true;
+                }
+                
+                // Анимация волн на воде
+                if (this.water) {
+                    const vertices = this.water.geometry.attributes.position.array;
+                    const time = Date.now() * 0.001;
+                    
+                    for (let i = 0; i <= 64; i++) {
+                        for (let j = 0; j <= 64; j++) {
+                            const idx = (i * 65 + j) * 3;
+                            const x = vertices[idx];
+                            const z = vertices[idx + 1];
+                            
+                            // Анимация волн
+                            const wave = 
+                                Math.sin(x * 0.02 + time) * Math.cos(z * 0.02) * 1 +
+                                Math.sin(x * 0.05) * Math.cos(z * 0.05 + time * 0.5) * 0.5;
+                            
+                            vertices[idx + 2] = wave;
+                        }
+                    }
+                    
+                    this.water.geometry.attributes.position.needsUpdate = true;
+                    this.water.geometry.computeVertexNormals();
+                }
+                
+                // Постепенное уменьшение энергии
+                this.settings.energy = Math.max(0, this.settings.energy - 0.008);
+                document.getElementById('energy-bar').querySelector('.bar-fill').style.width = this.settings.energy + '%';
+                document.getElementById('energy-value').textContent = Math.floor(this.settings.energy) + '%';
+                
+                // Если энергия закончилась, игра окончена
+                if (this.settings.energy <= 0) {
+                    this.gameOver();
+                }
+                
+                // Обновление времени суток
+                this.timeOfDay = (this.timeOfDay + 0.00005) % 1;
+                this.updateTimeDisplay();
+                
+                // Обновление погоды
+                this.updateWeather();
+                
+                // Обновление FPS
+                this.frameCount++;
+                const now = performance.now();
+                if (now - this.lastFpsUpdate >= 1000) {
+                    this.fps = this.frameCount;
+                    this.frameCount = 0;
+                    this.lastFpsUpdate = now;
+                    document.getElementById('fps-counter').textContent = 'FPS: ' + this.fps;
+                }
+                
+                // Обновление счетчика частиц
+                document.querySelector('.particle-counter').textContent = 'Частицы: ' + 
+                    (this.rainSystem ? this.rainSystem.geometry.attributes.position.count : 0);
+            }
+            
+            updateTimeDisplay() {
+                const timeDisplay = document.getElementById('time-display');
+                if (this.timeOfDay < 0.2 || this.timeOfDay > 0.8) {
+                    timeDisplay.textContent = 'Ночь, Гроза';
+                    timeDisplay.style.color = '#4fc3f7';
+                } else if (this.timeOfDay < 0.3 || this.timeOfDay > 0.7) {
+                    timeDisplay.textContent = 'Сумерки, Гроза';
+                    timeDisplay.style.color = '#ff9800';
+                } else {
+                    timeDisplay.textContent = 'День, Гроза';
+                    timeDisplay.style.color = '#ffeb3b';
+                }
+            }
+            
+            updateWeather() {
+                const weatherDisplay = document.getElementById('weather-display');
+                if (this.settings.weatherIntensity > 0.8) {
+                    weatherDisplay.textContent = 'Интенсивность: Сильная';
+                    weatherDisplay.style.color = '#ff5252';
+                } else if (this.settings.weatherIntensity > 0.5) {
+                    weatherDisplay.textContent = 'Интенсивность: Умеренная';
+                    weatherDisplay.style.color = '#ffd740';
+                } else {
+                    weatherDisplay.textContent = 'Интенсивность: Слабая';
+                    weatherDisplay.style.color = '#69f0ae';
+                }
+            }
+            
+            gameOver() {
+                this.gameState = 'gameOver';
+                document.getElementById('final-lightning').textContent = this.lightningCount;
+                document.getElementById('final-score').textContent = this.score;
+                document.getElementById('game-over').classList.remove('hidden');
+            }
+            
+            onWindowResize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+            
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                const currentTime = performance.now();
+                const deltaTime = Math.min(100, currentTime - this.lastTime);
+                this.lastTime = currentTime;
+                
+                this.update(deltaTime);
+                this.renderer.render(this.scene, this.camera);
+            }
         }
-      }
-
-      ctx.putImageData(imageData, startX, startY);
-    }
-
-    function hexToRgb(hex) {
-      const shorthand = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-      hex = hex.replace(shorthand, (m, r, g, b) => r + r + g + g + b + b);
-      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result
-        ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16),
-          }
-        : { r: 0, g: 0, b: 0 };
-    }
-
-    // Отрисовка всей видимой области
-    function render() {
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-      const startX = Math.floor(-offsetX / CHUNK_SIZE) * CHUNK_SIZE;
-      const startY = Math.floor(-offsetY / CHUNK_SIZE) * CHUNK_SIZE;
-
-      const endX = startX + CANVAS_WIDTH + CHUNK_SIZE * 2;
-      const endY = startY + CANVAS_HEIGHT + CHUNK_SIZE * 2;
-
-      for (let y = startY; y < endY; y += CHUNK_SIZE) {
-        for (let x = startX; x < endX; x += CHUNK_SIZE) {
-          drawChunk(x + offsetX, y + offsetY, CHUNK_SIZE, CHUNK_SIZE);
-        }
-      }
-    }
-
-    // Обработка мыши
-    canvas.addEventListener('mousedown', (e) => {
-      if (e.button === 2) {
-        isDragging = true;
-        lastX = e.clientX;
-        lastY = e.clientY;
-        canvas.style.cursor = 'grabbing';
-      }
-    });
-
-    canvas.addEventListener('mousemove', (e) => {
-      if (isDragging) {
-        const dx = e.clientX - lastX;
-        const dy = e.clientY - lastY;
-        offsetX -= dx;
-        offsetY -= dy;
-        lastX = e.clientX;
-        lastY = e.clientY;
-        render();
-      }
-    });
-
-    canvas.addEventListener('mouseup', (e) => {
-      if (e.button === 2) {
-        isDragging = false;
-        canvas.style.cursor = 'default';
-      }
-    });
-
-    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-
-    // Первый рендер
-    render();
-
-    // Адаптация под размер окна
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      render();
-    });
-  </script>
+        
+        // Запуск игры
+        window.addEventListener('load', () => {
+            new PhotoRealisticLightningSimulator();
+        });
+    </script>
 </body>
-</html>
+  </html>
