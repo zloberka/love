@@ -965,7 +965,7 @@
                 // Boundary checking
                 const pos = controls.getObject().position;
                 if (Math.abs(pos.x) > 20) {
-                    pos.x = pos.x > 0 ? 20 : -20;
+                                        pos.x = pos.x > 0 ? 20 : -20;
                     velocity.x = -velocity.x * 0.5;
                 }
                 if (Math.abs(pos.y) > 15) {
@@ -1031,4 +1031,4 @@
         animate(0);
     </script>
 </body>
-    </html>
+</html>
